@@ -61,14 +61,18 @@ class Room {
   }
 
   getPlayerList(){
-    const playerList = [];
+    let playerList = [];
     Object.keys(this.players).forEach(key => {
       const player = this.players[key];
-      playerList.push({
-        username: player.username,
-        score: player.score
-      });
-    })
+      if(player.isLeader){
+        const newList = [player.serialize()]
+        newList.push(...playerList)
+        playerList = newList;
+      } else {
+        playerList.push(player.serialize());
+      } 
+    });
+    console.log(playerList);
     return playerList;
   }
 

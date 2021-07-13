@@ -23,6 +23,7 @@ class Player {
   serialize() {
     return {
       username: this.username,
+      score: this.score,
       token: this.token,
       isLeader: !!this.isLeader,
     }

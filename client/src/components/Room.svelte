@@ -5,7 +5,7 @@
 
   export let params;
 
-  const roomCode = JSON.parse(sessionStorage.getItem('roomCode'));
+  const roomCode = sessionStorage.getItem('roomCode');
   const playerData = JSON.parse(sessionStorage.getItem('playerData'));
 
   let playersData = [];
