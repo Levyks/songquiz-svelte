@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const Player = require("./Player");
+const Game = require("./Game");
 const Spotify = require('./Spotify');
 
 class Room {
@@ -22,9 +23,10 @@ class Room {
 
   setPlaylist(data){
     this.playlistUrl = data.playlistUrl;
-    Spotify.getPlaylistInfo(data.playlistUrl).then(playlistInfo => {
-      this.playlistInfo = playlistInfo;
-      Room.io.in(this.code).emit("playlistUpdated", playlistInfo);
+    Spotify.getPlaylistInfo(data.playlistUrl).then(data => {
+      this.playlistInfo = data;
+      this.playlistSet = data.status === 200;
+      Room.io.in(this.code).emit("playlistUpdated", data);
     });
   }
 
@@ -36,12 +38,19 @@ class Room {
     });
   }
 
+  setLeaderListeners(socket){
+    socket.on("setPlaylist", (data) => {this.setPlaylist(data)});
+    socket.on("startGame", (data) => {
+      this.game = new Game(this);
+    })
+  }
+
   connectPlayer(data, socket) {
     let player;
 
     if(Player.authenticate(data.playerData, this.leader)) {
       player = this.leader;
-      socket.on("setPlaylist", (data) => {this.setPlaylist(data)});
+      this.setLeaderListeners(socket);
     }else {
       player = new Player(data.playerData.username, this);
       player.generateToken();
@@ -55,9 +64,13 @@ class Room {
 
     if(this.playlistInfo) player.socket.emit("playlistUpdated", this.playlistInfo);
 
-    Room.io.in(this.code).emit('syncPlayersData', this.getPlayerList());
+    this.syncPlayersData();
 
     this.sendResponse("connectToRoomResponse", socket, player.serialize());
+  }
+
+  syncPlayersData(){
+    Room.io.in(this.code).emit('syncPlayersData', this.getPlayerList());
   }
 
   getPlayerList(){
@@ -72,10 +85,14 @@ class Room {
         playerList.push(player.serialize());
       } 
     });
-    console.log(playerList);
     return playerList;
   }
 
+  syncGameState(){
+    Room.io.in(this.code).emit('syncGameState', {
+      status: this.game ? "inGame" : "inLobby", 
+    });
+  }
 
   static getRandomRoomCode(){
     return Math.floor(Math.random() * 10000).toString().padStart(4, "0");

@@ -5,8 +5,10 @@ const fs = require('fs');
 class Spotify {
   static accessToken;
 
-  static async getPlaylistTracks(url, secondTry = false){
+  static async getPlaylistTracks(url, onlyWithPreview = true, secondTry = false){
     const playlistId = Spotify.getPlaylistId(url);
+
+    if(!playlistId) return {status: 400, message: "This is not a valid Spotify playlist URL"};
 
     if(!Spotify.accessToken) await Spotify.getAccessToken();
 
@@ -26,7 +28,9 @@ class Spotify {
           }
         }).then(response => {
           response.data.items.forEach(item => {
-            tracks.push(item.track);
+            if(!onlyWithPreview || item.track.preview_url){
+              tracks.push(item.track);
+            }
           });
           nextUrl = response.data.next;
         }).catch(error => {
@@ -38,7 +42,7 @@ class Spotify {
       if(err === 401 && !secondTry){
         console.log("refreshing");
         await Spotify.getAccessToken();
-        return Spotify.getPlaylist(url, true);
+        return Spotify.getPlaylist(url, onlyWithPreview, true);
       }
     }
     
@@ -49,9 +53,11 @@ class Spotify {
   static async getPlaylistInfo(url, secondTry = false){
     const playlistId = Spotify.getPlaylistId(url);
 
+    if(!playlistId) return {status: 400, message: "This is not a valid Spotify playlist URL"};
+
     if(!Spotify.accessToken) await Spotify.getAccessToken();
 
-    const fields = "name,tracks(total)";
+    const fields = "name,tracks(items(track(preview_url)))";
     const fieldEncoded = encodeURIComponent(fields);
 
     try{
@@ -62,9 +68,16 @@ class Spotify {
           Authorization: `Bearer ${Spotify.accessToken}`
         }
       }).then(response => {
+        let valid_songs = 0;
+        response.data.tracks.items.forEach(item => {
+          if(item.track.preview_url) valid_songs += 1;
+        });
         return {
           status: response.status,
-          playlistInfo: response.data
+          playlistInfo: response.status === 200 ? {
+            name: response.data.name,
+            valid_songs
+          } : response.data
         };
       }).catch(error => {
         if(error.response.status === 401) throw 401;
@@ -74,7 +87,7 @@ class Spotify {
         return {status: error.response}
       });
     } catch(err) {
-      if(!secondTry){
+      if(err === 401 && !secondTry){
         await Spotify.getAccessToken();
         return Spotify.getPlaylistInfo(url, true);
       }

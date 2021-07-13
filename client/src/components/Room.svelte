@@ -1,22 +1,16 @@
 <script>
   import { push } from 'svelte-spa-router';
   import { io } from 'socket.io-client';
-  import axios from 'axios';
+  import Lobby from './Lobby.svelte';
 
   export let params;
 
-  const roomCode = sessionStorage.getItem('roomCode');
-  const playerData = JSON.parse(sessionStorage.getItem('playerData'));
+  let gameState;
 
   let playersData = [];
+  let playerData = JSON.parse(sessionStorage.getItem('playerData'));;
 
-  let isLoadingPlaylist = false;
-  let errorFetchingPlaylist = false;
-
-  let playlistUrl;
-  let lastPlaylistUrlFetched;
-  let playlistInfo = {};
-  let playlistLabel = "";
+  const roomCode = sessionStorage.getItem('roomCode');
 
   if(params.roomCode != roomCode){
     push(`/play/join/${params.roomCode}`);
@@ -30,41 +24,17 @@
       playerData = response.playerData;
     });
   }
-  
+
+  connectToRoom(roomCode, playerData);
+
   socket.on('syncPlayersData', players => {
     playersData = players;
   });
 
-  socket.on('playlistUpdated', data => {
-    if(data.status === 200){
-      playlistInfo = data.playlistInfo;
-
-      playlistLabel = `${playlistInfo.name} | ${playlistInfo.tracks.total} songs`;
-
-      errorFetchingPlaylist = false;
-      isLoadingPlaylist = false;
-    } else {
-
-      playlistLabel = `Error: ${data.message}`;
-
-      errorFetchingPlaylist = true;
-      isLoadingPlaylist = false;
-    }
+  socket.on('syncGameState', data => {
+    gameState = data;
+    console.log(gameState);
   });
-
-  connectToRoom(roomCode, playerData);
-
-  function handlePlaylistUrlBlur(){
-    if(!playlistUrl || playlistUrl === lastPlaylistUrlFetched) return;
-
-    isLoadingPlaylist = true;
-    lastPlaylistUrlFetched = playlistUrl;
-
-    socket.emit('setPlaylist', {playlistUrl});
-      
-  }
-
-
 </script>
 
 <main>
@@ -74,31 +44,7 @@
 
     </div>
     <div class="main-window app-window">
-
-      <div class="form-group">
-        <label for="username-input">Username</label>
-        <input class="form-control" value={playerData.username} id="username-input" readonly>
-      </div>
-      
-      <div class="form-group">
-        <label for="playlist-input">Playlist</label>
-        <div class="input-group mb-1">
-          <input class="form-control" class:text-danger={errorFetchingPlaylist} placeholder="Playlist not set yet" id="playlist-input" value={playlistLabel} readonly>
-          {#if isLoadingPlaylist}
-          <div class="input-group-append">
-            <span class="input-group-text">
-              <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-              </div>
-            </span>
-          </div>
-          {/if}
-        </div>
-        {#if playerData.isLeader}
-        <input class="form-control" on:blur={handlePlaylistUrlBlur} bind:value={playlistUrl} placeholder="An spotify playlist URL" id="playlist-url-input">
-        {/if}
-      </div>  
-
+      <Lobby {socket} {playerData} />
     </div>
     <div class="right-window app-window text-center">
       <h3>Room {roomCode}</h3>
@@ -146,11 +92,6 @@
     background-color: #eaeaea;
     padding: 10px;
     border-radius: 10px;
-  }
-
-  .spinner-border {
-    width: 22px;
-    height: 22px;
   }
 
 </style>
