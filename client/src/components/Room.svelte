@@ -2,10 +2,11 @@
   import { push } from 'svelte-spa-router';
   import { io } from 'socket.io-client';
   import Lobby from './Lobby.svelte';
+  import Game from './Game.svelte';
 
   export let params;
 
-  let gameState;
+  let roomState = {};
 
   let playersData = [];
   let playerData = JSON.parse(sessionStorage.getItem('playerData'));;
@@ -31,9 +32,8 @@
     playersData = players;
   });
 
-  socket.on('syncGameState', data => {
-    gameState = data;
-    console.log(gameState);
+  socket.on('syncRoomState', data => {
+    roomState = data;
   });
 </script>
 
@@ -44,7 +44,11 @@
 
     </div>
     <div class="main-window app-window">
+      {#if roomState.status == "inLobby" }
       <Lobby {socket} {playerData} />
+      {:else if roomState.status == "inGame"}
+      <Game {socket} />
+      {/if}
     </div>
     <div class="right-window app-window text-center">
       <h3>Room {roomCode}</h3>

@@ -69,6 +69,7 @@ class Spotify {
         }
       }).then(response => {
         let valid_songs = 0;
+        let total_songs = response.data.tracks.items.length;
         response.data.tracks.items.forEach(item => {
           if(item.track.preview_url) valid_songs += 1;
         });
@@ -76,7 +77,8 @@ class Spotify {
           status: response.status,
           playlistInfo: response.status === 200 ? {
             name: response.data.name,
-            valid_songs
+            valid_songs,
+            total_songs
           } : response.data
         };
       }).catch(error => {

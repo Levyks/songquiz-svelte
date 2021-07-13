@@ -8,6 +8,8 @@ class Room {
 
   constructor(socket, username) {
     this.code = Room.getUniqueRoomCode(); 
+    this.ioChannel = Room.io.in(this.code);
+
     Room.rooms[this.code] = this;
 
     this.players = {};
@@ -64,13 +66,15 @@ class Room {
 
     if(this.playlistInfo) player.socket.emit("playlistUpdated", this.playlistInfo);
 
+    this.syncRoomState(socket);
+
     this.syncPlayersData();
 
     this.sendResponse("connectToRoomResponse", socket, player.serialize());
   }
 
   syncPlayersData(){
-    Room.io.in(this.code).emit('syncPlayersData', this.getPlayerList());
+    this.ioChannel.emit('syncPlayersData', this.getPlayerList());
   }
 
   getPlayerList(){
@@ -88,8 +92,8 @@ class Room {
     return playerList;
   }
 
-  syncGameState(){
-    Room.io.in(this.code).emit('syncGameState', {
+  syncRoomState(socket = this.ioChannel){
+    socket.emit('syncRoomState', {
       status: this.game ? "inGame" : "inLobby", 
     });
   }
