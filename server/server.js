@@ -13,6 +13,7 @@ const io = require("socket.io")(httpServer, {
 
 app.use(cors());
 
+app.use(express.static('../client/public'));
 
 const Room = require("./src/Classes/Room");
 const Spotify = require('./src/Classes/Spotify');

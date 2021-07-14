@@ -1,4 +1,3 @@
-const crypto = require("crypto");
 const Player = require("./Player");
 const Game = require("./Game");
 const Spotify = require('./Spotify');
@@ -12,12 +11,12 @@ class Room {
 
     Room.rooms[this.code] = this;
 
+    this.game = new Game(this);
+
     this.players = {};
 
     this.leader = new Player(username, this);
-
     this.leader.generateToken();
-
     this.leader.isLeader = true;
 
     this.sendResponse("createRoomResponse", socket, this.leader.serialize());
@@ -43,7 +42,7 @@ class Room {
   setLeaderListeners(socket){
     socket.on("setPlaylist", (data) => {this.setPlaylist(data)});
     socket.on("startGame", (data) => {
-      this.game = new Game(this);
+      this.game.startGame();
     })
   }
 
@@ -80,22 +79,21 @@ class Room {
   getPlayerList(){
     let playerList = [];
     Object.keys(this.players).forEach(key => {
-      const player = this.players[key];
-      if(player.isLeader){
-        const newList = [player.serialize()]
-        newList.push(...playerList)
-        playerList = newList;
-      } else {
-        playerList.push(player.serialize());
-      } 
+      playerList.push(this.players[key].serialize()); 
     });
+    playerList.sort((a,b) => a.score < b.score ? 1 : -1);
     return playerList;
   }
 
   syncRoomState(socket = this.ioChannel){
-    socket.emit('syncRoomState', {
-      status: this.game ? "inGame" : "inLobby", 
-    });
+    let roomState = {
+      currentlyIn: this.game.started ? "game" : "lobby",
+    };
+    if(this.game.started) {
+      roomState.game = this.game.getGameState();
+    }
+
+    socket.emit('syncRoomState', roomState);
   }
 
   static getRandomRoomCode(){

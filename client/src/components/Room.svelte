@@ -6,8 +6,11 @@
 
   export let params;
 
-  let roomState = {};
+  let roomState = {
+    currentlyIn: "lobby"
+  };
 
+  let gameIsStarting = false;
   let playersData = [];
   let playerData = JSON.parse(sessionStorage.getItem('playerData'));;
 
@@ -35,6 +38,12 @@
   socket.on('syncRoomState', data => {
     roomState = data;
   });
+
+  socket.on('startingGame', () => {
+    gameIsStarting = true;
+    roomState.currentlyIn = "game";
+  });
+
 </script>
 
 <main>
@@ -44,10 +53,10 @@
 
     </div>
     <div class="main-window app-window">
-      {#if roomState.status == "inLobby" }
+      {#if roomState.currentlyIn == "lobby" }
       <Lobby {socket} {playerData} />
-      {:else if roomState.status == "inGame"}
-      <Game {socket} />
+      {:else if roomState.currentlyIn == "game"}
+      <Game {socket} {gameIsStarting}/>
       {/if}
     </div>
     <div class="right-window app-window text-center">
