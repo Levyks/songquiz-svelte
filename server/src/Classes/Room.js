@@ -60,14 +60,17 @@ class Room {
     if(data.playerData.isLeader && Player.isTheSame(data.playerData, this.leader)) {
       player = this.leader;
       this.setLeaderListeners(socket);
+      this.log(`Leader ${player.username} (re)connected`);
 
     //If player was previously connected  
     } else if (this.players[data.playerData.username] && Player.isTheSame(data.playerData, this.players[data.playerData.username])) {
       player = this.players[data.playerData.username];
+      this.log(`Player ${player.username} reconnected`)
 
     //If it's a new player
     } else {
       player = new Player(data.playerData.username, this);
+      this.log(`Player ${player.username} connected`);
     }
 
     player.setSocket(socket);
