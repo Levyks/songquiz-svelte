@@ -19,22 +19,22 @@ class Room {
     this.leader = new Player(username, this);
     this.leader.isLeader = true;
 
+    this.log(`Room created by ${this.leader.username}`);
+
     Room.sendResponse("createRoomResponse", socket, {roomCode: this.code, playerData: this.leader.serialize(true)});
   }
 
-  setPlaylist(data){
+  async setPlaylist(data){
     this.playlistUrl = data.playlistUrl;
-    if(this.playlistUrl === '') {
-      this.playlistInfo = undefined;
-      this.syncRoomState();
-      return;
-    }
 
-    Spotify.getPlaylistInfo(data.playlistUrl).then(data => {
-      this.playlistInfo = data;
-      this.playlistSet = data.status === 200;
-      this.syncRoomState();
-    });
+    this.playlist = this.playlistUrl !== '' ? await Spotify.getPlaylistInfo(data.playlistUrl) : undefined;
+    this.playlistSet = this.playlist && this.playlist.status === 200;
+    this.syncRoomState();
+
+    this.log(this.playlistSet ? 
+      `Playlist set succesfuly to ${this.playlist.info.name}` : this.playlist ?
+      `Playlist not set, reason: Error ${this.playlist.status}` :
+      `Playlist unset`);
   }
 
   static sendResponse(responseName, socket, data, status = 200) {
@@ -53,8 +53,6 @@ class Room {
 
   connectPlayer(data, socket) {
     let player;
-
-    console.log("connecting", data);
 
     //If player is the leader
     if(data.playerData.isLeader && Player.isTheSame(data.playerData, this.leader)) {
@@ -103,16 +101,20 @@ class Room {
     return playerList;
   }
 
-  syncRoomState(socket = this.ioChannel){
+  syncRoomState(socket = this.ioChannel) {
     let roomState = {
       currentlyIn: this.game.started ? "game" : "lobby",
-      playlist: this.playlistInfo
+      playlist: this.playlist
     };
     if(this.game.started) {
       roomState.game = this.game.getGameState();
     }
 
     socket.emit('syncRoomState', roomState);
+  }
+
+  log(message) {
+    console.log(`[${this.code}] | ${new Date().toLocaleTimeString()} -> ${message}`);
   }
 
   static getRandomRoomCode(){

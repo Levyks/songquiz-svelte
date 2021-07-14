@@ -40,7 +40,6 @@
   }
 
   socket.on('syncPlayersData', players => {
-    console.log(players);
     playersData = players;
   });
 
