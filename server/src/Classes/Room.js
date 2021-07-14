@@ -13,6 +13,8 @@ class Room {
 
     this.game = new Game(this);
 
+    this.currentlyIn = 'lobby';
+
     this.players = {};
     this.currentlyConnectedPlayers = 0;
 
@@ -74,8 +76,6 @@ class Room {
 
     player.socket.join(this.code);
 
-    if(this.playlistInfo) player.socket.emit("playlistUpdated", this.playlistInfo);
-
     this.syncRoomState(socket);
 
     this.syncPlayersData();
@@ -95,7 +95,6 @@ class Room {
       playerList.push(this.players[key].serialize()); 
     });
     if(this.game.started) {
-      console.log("the game has started, sorting player list");
       playerList.sort((a,b) => a.score < b.score ? 1 : -1);
     } 
     return playerList;
@@ -103,7 +102,7 @@ class Room {
 
   syncRoomState(socket = this.ioChannel) {
     let roomState = {
-      currentlyIn: this.game.started ? "game" : "lobby",
+      currentlyIn: this.currentlyIn,
       playlist: this.playlist
     };
     if(this.game.started) {

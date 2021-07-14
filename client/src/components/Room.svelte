@@ -12,7 +12,6 @@
   };
 
   let roomIsLoading = true;
-  let gameIsStarting = false;
   let playersData = [];
   
   const lastRoomJoined = localStorage.getItem('lastRoomJoined');
@@ -48,7 +47,6 @@
   });
 
   socket.on('startingGame', () => {
-    gameIsStarting = true;
     roomState.currentlyIn = "game";
   });
 

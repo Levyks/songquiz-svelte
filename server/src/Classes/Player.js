@@ -24,7 +24,7 @@ class Player {
     });
 
     this.socket.on('disconnect', () => {
-      console.log(`Player ${this.username} disconnected`);
+      this.room.log(`Player ${this.username} disconnected`);
       this.room.currentlyConnectedPlayers -= 1;
 
       delete this.socket;

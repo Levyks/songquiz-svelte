@@ -22,7 +22,7 @@ class Round {
 
   generateChoices(numberOfChoices) {
     const indexes = [];
-    const numberOfValidSongs = this.game.playlistInfo.playlistInfo.valid_songs;
+    const numberOfValidSongs = this.game.playlist.info.valid_songs;
     
     while(indexes.length < numberOfChoices) {
       const randomIndex = Math.floor(Math.random()*numberOfValidSongs);
@@ -30,8 +30,6 @@ class Round {
     }
 
     this.correctChoice = Math.floor(Math.random()*numberOfChoices);
-
-    console.log(`correct choice = ${this.correctChoice}`);
 
     this.choices = []
 
@@ -41,7 +39,7 @@ class Round {
   }
 
   startRound() {
-    console.log(`Round ${this.roundNumber} in room ${this.game.room.code} starting`);
+    this.room.log(`Round ${this.roundNumber} starting, the correct choice is ${this.correctChoice}`);
     this.game.started = true;
 
     this.currentPhase = 'playing';

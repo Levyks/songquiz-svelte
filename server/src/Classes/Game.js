@@ -12,14 +12,21 @@ class Game {
   startGame() {
     this.timePerRound = 15;
 
+    this.room.log("Starting Game");
+    this.room.currentlyIn = 'game';
+    this.room.syncRoomState();
+
+
     this.playlistUrl = this.room.playlistUrl;
-    this.playlistInfo = this.room.playlistInfo;
+    this.playlist = this.room.playlist;
 
-    if(!this.playlistInfo) return;
+    if(!this.playlist) return;
 
-    this.room.ioChannel.emit("startingGame");
+    this.room.log("Starting to fetch tracks");
 
     Spotify.getPlaylistTracks(this.playlistUrl).then(tracks => {
+      this.room.log("All tracks fetched");
+
       this.playlistTracks = tracks;
 
       this.startRound(0);
