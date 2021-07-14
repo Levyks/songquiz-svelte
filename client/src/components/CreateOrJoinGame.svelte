@@ -1,9 +1,12 @@
 <script>
 	import {createEventDispatcher} from 'svelte';
-import { push } from 'svelte-spa-router';
+	import { push } from 'svelte-spa-router';
 
 	export let params = undefined;
 	export let socket;
+
+	socket.disconnect();
+	socket.connect();
 
 	const dispatch = createEventDispatcher();
 

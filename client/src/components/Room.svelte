@@ -41,6 +41,13 @@
     });
   }
 
+  function handleLeaveClick(){
+    if(window.confirm("Do you want to leave the room?")){
+      socket.emit('leaveRoom');
+      push('/play');
+    }
+  }
+
 
   socket.on('syncRoomState', data => {
     roomState = data;
@@ -57,7 +64,10 @@
 </script>
 
 <main>
-  <div class="mb-2"></div>
+  <div>
+    <button class="btn leave-btn" on:click={handleLeaveClick}><i class="fas fa-arrow-left"></i></button>
+  </div>
+
   <div class="room-wrapper">
     {#if roomIsLoading}
       <div class="app-window w-100 text-center">
@@ -110,6 +120,11 @@
     width: 192px;
     height: 192px;
     border-width: 0.5em;
+  }
+
+  .leave-btn {
+    margin: 0;
+    font-size: 30px;
   }
 
   @media only screen and (max-width: 1200px) {

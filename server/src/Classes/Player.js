@@ -23,13 +23,36 @@ class Player {
       this.room.game.currentRound.handleChoice(this, choice);
     });
 
-    this.socket.on('disconnect', () => {
-      this.room.log(`Player ${this.username} disconnected`);
-      this.room.currentlyConnectedPlayers -= 1;
-
+    this.socket.on('leaveRoom', () => {
+      this.socket.removeAllListeners();
+      this.socket.disconnect();
       delete this.socket;
 
+      this.room.currentlyConnectedPlayers -= 1;
+
+      delete this.room.players[this.username];
+
       this.room.syncPlayersData();
+
+      this.room.log(`Player ${this.username} left the room`);
+      
+      this.room.constructor.deleteRoomIfEmpty(this.room.code);
+
+    });
+
+    this.socket.on('disconnect', () => {
+      this.socket.removeAllListeners();
+      delete this.socket;
+
+      this.room.currentlyConnectedPlayers -= 1;
+
+      this.room.syncPlayersData();
+
+      this.room.log(`Player ${this.username} disconnected`);
+
+      if(!this.room.currentlyConnectedPlayers) {
+        this.room.constructor.scheduleDeleteRoomIfEmpty(this.room.code);    
+      }
       /*
       if(!Object.keys(this.room.players).length){
         console.log(`Deleting room ${this.room.code}`);

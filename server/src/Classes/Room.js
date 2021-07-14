@@ -2,6 +2,8 @@ const Player = require("./Player");
 const Game = require("./Game");
 const Spotify = require('./Spotify');
 
+const TIME_BEFORE_DELETING_ROOM = 30
+
 class Room {
   static rooms = {}
 
@@ -10,6 +12,8 @@ class Room {
     this.ioChannel = Room.io.in(this.code);
 
     Room.rooms[this.code] = this;
+
+    this.deletionTimeOut = false;
 
     this.game = new Game(this);
 
@@ -71,6 +75,12 @@ class Room {
     } else {
       player = new Player(data.playerData.username, this);
       this.log(`Player ${player.username} connected`);
+    }
+
+    if(this.deletionTimeOut) {
+      clearTimeout(this.deletionTimeOut)
+      this.deletionTimeOut = false;
+      this.log("Scheduled deletion canceled");
     }
 
     player.setSocket(socket);
@@ -136,6 +146,23 @@ class Room {
     } else {
       Room.sendResponse("connectToRoomResponse", socket, {error: "not found"}, 404);
     }
+  }
+
+  static deleteRoomIfEmpty(roomCode) {
+    const room = Room.rooms[roomCode];
+    if(!room.currentlyConnectedPlayers) {
+      room.log("No one left in the room, deleting it");
+      room.deleted = true;
+      delete Room.rooms[roomCode];
+    }
+  }
+
+  static scheduleDeleteRoomIfEmpty(roomCode) {
+    const room = Room.rooms[roomCode];
+    room.log(`No one left in the room, deleting it in ${TIME_BEFORE_DELETING_ROOM} seconds if no one joins`)
+    room.deletionTimeOut = setTimeout(() => {
+      Room.deleteRoomIfEmpty(roomCode)
+    }, TIME_BEFORE_DELETING_ROOM * 1000) ;
   }
 
 
