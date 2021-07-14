@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const Room = require("./Room");
 
 class Player {
 
@@ -7,40 +6,57 @@ class Player {
     this.room = room;
     this.username = username;
     this.score = 0;
+    this.token = Player.generateToken();
   }
 
   setSocket(socket) {
+    if(this.socket) {
+      this.socket.disconnect();
+      delete this.socket;
+    }
+
     this.socket = socket;
+
+    this.room.currentlyConnectedPlayers += 1;
 
     this.socket.on('roundChoice', choice => {
       this.room.game.currentRound.handleChoice(this, choice);
     });
 
     this.socket.on('disconnect', () => {
-      if(!this.room.players.length){
+      console.log(`Player ${this.username} disconnected`);
+      this.room.currentlyConnectedPlayers -= 1;
+
+      delete this.socket;
+
+      this.room.syncPlayersData();
+      /*
+      if(!Object.keys(this.room.players).length){
         console.log(`Deleting room ${this.room.code}`);
-        delete this.room;
+        delete this.room.constructor.rooms[this.room.code];
       } else{
         delete this.room.players[this.username];
       }
-      console.log(`Player ${this.username} disconnected`);
+      */
     });
   }
 
-  generateToken() {
-    this.token = crypto.randomBytes(48).toString('hex');
-  }
-
-  serialize() {
-    return {
+  serialize(includeToken = false) {
+    let playerSerializedData = {
       username: this.username,
       score: this.score,
-      token: this.token,
       isLeader: !!this.isLeader,
+      isConnected: !!this.socket
     }
+    if(includeToken) playerSerializedData.token = this.token;
+    return playerSerializedData;
   }
 
-  static authenticate(credentials, player){
+  static generateToken() {
+    return crypto.randomBytes(48).toString('hex');
+  }
+
+  static isTheSame(credentials, player){
     return credentials.username === player.username && credentials.token === player.token;
   }
 

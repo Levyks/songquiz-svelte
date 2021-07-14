@@ -15,6 +15,8 @@ class Game {
     this.playlistUrl = this.room.playlistUrl;
     this.playlistInfo = this.room.playlistInfo;
 
+    if(!this.playlistInfo) return;
+
     this.room.ioChannel.emit("startingGame");
 
     Spotify.getPlaylistTracks(this.playlistUrl).then(tracks => {
@@ -26,15 +28,16 @@ class Game {
 
   startRound(roundNumber) {
     const round = new Round(roundNumber, this);
-    round.startRound();
     this.rounds.push(round);
     this.currentRound = round;
+    round.startRound();
   }
 
   getGameState(){
     let gameState = {
-      currentRound: this.rounds[this.rounds.length - 1].getRoundState()
+      currentRound: this.currentRound.getRoundState()
     }
+    return gameState;
   }
 
 

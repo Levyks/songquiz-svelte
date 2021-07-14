@@ -2,6 +2,9 @@ require('dotenv').config()
 const axios = require('axios');
 const fs = require('fs');
 
+//const { performance } = require('perf_hooks');
+
+
 class Spotify {
   static accessToken;
 
@@ -57,7 +60,7 @@ class Spotify {
 
     if(!Spotify.accessToken) await Spotify.getAccessToken();
 
-    const fields = "name,tracks(items(track(preview_url)))";
+    const fields = "name,tracks(items(track(preview_url))),external_urls(spotify)";
     const fieldEncoded = encodeURIComponent(fields);
 
     try{
@@ -75,8 +78,9 @@ class Spotify {
         });
         return {
           status: response.status,
-          playlistInfo: response.status === 200 ? {
+          info: response.status === 200 ? {
             name: response.data.name,
+            href: response.data.external_urls.spotify,
             valid_songs,
             total_songs
           } : response.data
@@ -97,8 +101,9 @@ class Spotify {
   }
 
   static getPlaylistId(url){
-    url = url.split('?')[0].split('//')[1];
-    const urlParts = url.split('/');
+    url = url.split('?')[0].split('//');
+    if(url.length < 2) return false;
+    const urlParts = url[1].split('/');
     if(urlParts[1] !== 'playlist') return false;
 
     return urlParts[2];
@@ -128,9 +133,16 @@ module.exports = Spotify
 Spotify.accessToken = JSON.parse(fs.readFileSync('./token.json')).access_token;
 
 /*
-Spotify.getPlaylistInfo("https://open.spotify.com/playlist/37i9dQZF1DX0FOF1IUWK1W?si=6a366ec92bc249de").then(playlistInfo => {
-  console.log(playlistInfo);
+var t0 = performance.now()
+
+Spotify.getPlaylistTracks("https://open.spotify.com/playlist/37i9dQZF1DX0FOF1IUWK1W?si=6a366ec92bc249de").then(playlistInfo => {
+  var t1 = performance.now()
+  console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.")
 });
+//asd sad
+
+/*
+
 */
 
 //Spotify.getPlaylistTracks("https://open.spotify.com/playlist/37i9dQZF1DX0FOF1IUWK1W?si=6a366ec92bc249de").then(console.log);

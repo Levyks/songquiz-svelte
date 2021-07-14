@@ -1,36 +1,24 @@
 <script>
   export let socket
   export let playerData;
+  export let roomState;
 
   let isLoadingPlaylist = false;
-  let errorFetchingPlaylist = false;
 
-  let playlistUrl;
-  let lastPlaylistUrlFetched;
-  let playlistInfo = {};
-  let playlistLabel = "";
+  let playlistUrl = roomState.playlist && roomState.playlist.info && roomState.playlist.info.href;
+  let lastPlaylistUrlFetched = playlistUrl;
+  let validPlaylistSet = false;
 
   let inviteFriendsUrlInput;
 
-  socket.on('playlistUpdated', data => {
-    if(data.status === 200){
-      playlistInfo = data.playlistInfo;
+  $: trackRoomStateChange(roomState);
 
-      playlistLabel = `${playlistInfo.name} | ${playlistInfo.valid_songs} valid songs`;
-
-      errorFetchingPlaylist = false;
-      isLoadingPlaylist = false;
-    } else {
-
-      playlistLabel = `Error: ${data.message}`;
-
-      errorFetchingPlaylist = true;
-      isLoadingPlaylist = false;
-    }
-  });
+  function trackRoomStateChange(state) {
+    isLoadingPlaylist = false;
+  }
 
   function handlePlaylistUrlBlur(){
-    if(!playlistUrl || playlistUrl === lastPlaylistUrlFetched) return;
+    if(playlistUrl === lastPlaylistUrlFetched) return;
 
     isLoadingPlaylist = true;
     lastPlaylistUrlFetched = playlistUrl;
@@ -60,7 +48,17 @@
   <label for="playlist-input">Playlist</label>
   <div class="input-group mb-1">
 
-    <input class="form-control" class:text-danger={errorFetchingPlaylist} placeholder="Playlist not set yet" id="playlist-input" value={playlistLabel} readonly>
+    <span class="form-control" readonly>
+    {#if roomState.playlist}
+      {#if roomState.playlist.status == 200}
+        <a href={roomState.playlist.info.href} target="_blank">{roomState.playlist.info.name} | {roomState.playlist.info.valid_songs} valid songs</a>
+      {:else}
+        <span class="text-danger">Error: {roomState.playlist.message}</span>
+      {/if}
+    {:else}
+      Playlist not set yet
+    {/if}
+    </span>
     
     {#if isLoadingPlaylist}
     <div class="input-group-append">
@@ -95,7 +93,7 @@
 
 <div class=text-center>
 {#if playerData.isLeader}
-  <button class="btn btn-primary" on:click={startGame}>Start the game</button>
+  <button class="btn btn-primary" on:click={startGame} disabled={!(roomState.playlist && roomState.playlist.status == 200)} title={validPlaylistSet ? '' : "No playlist set"}>Start the game</button>
 {:else}
   <button class="btn btn-primary" disabled>Waiting for the leader to start</button>
 {/if}

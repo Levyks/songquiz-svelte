@@ -1,10 +1,13 @@
 <script>
 import Router, { push } from 'svelte-spa-router';
 import { wrap } from 'svelte-spa-router/wrap';
+import { io } from "socket.io-client";
 
 import CreateOrJoinGame from './components/CreateOrJoinGame.svelte';
 import NotFound from './components/NotFound.svelte';
 import Room from './components/Room.svelte';
+
+const socket = io(`${__songQuiz.env.SERVER_URL}`);
 
 function handleRouteEvent(event){
 	switch(event.detail.action){
@@ -21,15 +24,22 @@ function getRoomData(){
 	return roomData;
 }
 
+const createOrJoinGameRoute = wrap({
+	component: CreateOrJoinGame,
+	props: { socket }
+});
 
 const routes = {
-	'/': CreateOrJoinGame,
+	'/': createOrJoinGameRoute,
  
-	'/play': CreateOrJoinGame,
+	'/play': createOrJoinGameRoute,
 
-	'/play/join/:roomCode': CreateOrJoinGame,
+	'/play/join/:roomCode': createOrJoinGameRoute,
 
-	'/play/room/:roomCode': Room,
+	'/play/room/:roomCode': wrap({
+		component: Room,
+		props: { socket }
+	}),
 
 	'*': NotFound
 };

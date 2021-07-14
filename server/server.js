@@ -29,10 +29,7 @@ io.on('connection', socket => {
       case "joinRoom":
         break;
       case "connectToRoom":
-        const room = Room.rooms[data.code];
-        if(room){
-          room.connectPlayer(data, socket);
-        }
+        Room.findRoomAndConnect(data, socket);
         break;
       default:
         break;
@@ -40,12 +37,9 @@ io.on('connection', socket => {
   });
 });
 
-app.use('/get-playlist-info', (req, res) => {
-  console.log(req.query);
-  const playlistUrl = decodeURIComponent(req.query.url)
-  Spotify.getPlaylistInfo(playlistUrl).then(playlistInfo => {
-    res.status(playlistInfo.status).json(playlistInfo);
-  })
+app.use('/rooms', (req, res) => {
+  console.log(Room.rooms);
+  res.sendStatus(200);
 })
 
 httpServer.listen(3000);

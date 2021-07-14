@@ -16,7 +16,7 @@ class Round {
 
   generateRoundType() {
     this.roundType = Math.random() < 0.5 ? "artist" : "song";
-    this.roundType = "song";
+    this.roundType = "song"; //JUST FOR TESTS
     return this.roundType; 
   }
 
@@ -42,48 +42,41 @@ class Round {
 
   startRound() {
     console.log(`Round ${this.roundNumber} in room ${this.game.room.code} starting`);
+    this.game.started = true;
 
-    this.openToAnswers = true;
+    this.currentPhase = 'playing';
     this.startedAt = Date.now();
     
-    this.room.ioChannel.emit("startingRound", this.getRoundState(true));
+    this.room.syncRoomState();
 
     setTimeout(() => {this.endRound()}, (this.game.timePerRound + TIME_TO_CLOSE_OFFSET) * 1000);
   }
 
   endRound() {
-    this.openToAnswers = false;
+    this.currentPhase = 'results';
 
-    const playersThatGotItRight = [];
+    this.playersThatGotItRight = [];
 
     Object.keys(this.playersAnswers).forEach(username => {
       if(this.playersAnswers[username].gotItRight) {
-        playersThatGotItRight.push({
+        this.playersThatGotItRight.push({
           username,
           score: this.playersAnswers[username].score
         });
         this.players[username].score += this.playersAnswers[username].score;
       }
     });
-    playersThatGotItRight.sort((a, b) => a.score < b.score ? 1 : -1);
+    this.playersThatGotItRight.sort((a, b) => a.score < b.score ? 1 : -1);
 
-    Object.keys(this.players).forEach(username => {
-      let answerData = this.playersAnswers[username] || {
-        gotItRight: false,
-        score: 0,
-      }  
-
-      answerData.correctChoice = this.correctChoice;
-      answerData.playersThatGotItRight = playersThatGotItRight;
-      answerData.nextRoundStartingIn = TIME_BETWEEN_ROUNDS;
-
-      this.players[username].socket.emit("roundResult", answerData);
-    });
-
-    this.room.syncPlayersData();
+    this.nextRoundTimerStartedAt = Date.now();
     setTimeout(() => {
-      this.game.startRound(this.roundNumber+1);
+      if(this.room.constructor.rooms[this.room.code]){
+        this.game.startRound(this.roundNumber+1);
+      }
     }, TIME_BETWEEN_ROUNDS * 1000);
+
+    this.room.syncRoomState();
+    this.room.syncPlayersData();
   }
 
   getTimeRemaining(justStarted = false, round = true) {
@@ -94,18 +87,41 @@ class Round {
     return timeRemaining;
   }
 
+  getTimeRemainingForNextRound(justStarted = false, round = true) {
+    if(justStarted) return TIME_BETWEEN_ROUNDS;
+    let timeRemaining = TIME_BETWEEN_ROUNDS - (Date.now() - this.nextRoundTimerStartedAt)/1000;
+    if(round) timeRemaining = Math.ceil(timeRemaining);
+
+    return timeRemaining;
+  }
+
   getRoundState(justStarted = false) {
-    return {
-      type: this.roundType,
-      choices: this.choices,
-      trackToPlay: this.choices[this.correctChoice].preview_url,
-      number: this.roundNumber,
-      remainingTime: this.getTimeRemaining(justStarted)
+    let roundState = {
+      currentPhase: this.currentPhase
+    };
+    if(this.currentPhase === 'playing'){
+      roundState = {
+        ...roundState,
+        type: this.roundType,
+        choices: this.choices,
+        trackToPlay: this.choices[this.correctChoice].preview_url,
+        number: this.roundNumber,
+        remainingTime: this.getTimeRemaining(justStarted)
+      }
+    } else if (this.currentPhase === 'results') {
+      roundState = {
+        ...roundState, 
+        number: this.roundNumber,
+        playersThatGotItRight: this.playersThatGotItRight,
+        correctChoice: this.correctChoice,
+        timeRemainingForNextRound: this.getTimeRemainingForNextRound()
+      }
     }
+    return roundState;
   }
 
   handleChoice(player, choice) {
-    if(this.playersAnswers[player.username]) return;
+    if(this.currentPhase !== 'playing' || this.playersAnswers[player.username]) return;
 
     this.playersAnswers[player.username] = {
       gotItRight: choice == this.correctChoice,

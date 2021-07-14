@@ -14,28 +14,33 @@ class Room {
     this.game = new Game(this);
 
     this.players = {};
+    this.currentlyConnectedPlayers = 0;
 
     this.leader = new Player(username, this);
-    this.leader.generateToken();
     this.leader.isLeader = true;
 
-    this.sendResponse("createRoomResponse", socket, this.leader.serialize());
+    Room.sendResponse("createRoomResponse", socket, {roomCode: this.code, playerData: this.leader.serialize(true)});
   }
 
   setPlaylist(data){
     this.playlistUrl = data.playlistUrl;
+    if(this.playlistUrl === '') {
+      this.playlistInfo = undefined;
+      this.syncRoomState();
+      return;
+    }
+
     Spotify.getPlaylistInfo(data.playlistUrl).then(data => {
       this.playlistInfo = data;
       this.playlistSet = data.status === 200;
-      Room.io.in(this.code).emit("playlistUpdated", data);
+      this.syncRoomState();
     });
   }
 
-  sendResponse(responseName, socket, playerData) {
+  static sendResponse(responseName, socket, data, status = 200) {
     socket.emit(responseName, {
-      status: "success",
-      roomCode: this.code,
-      playerData, 
+      status: status,
+      ...data, 
     });
   }
 
@@ -49,12 +54,20 @@ class Room {
   connectPlayer(data, socket) {
     let player;
 
-    if(Player.authenticate(data.playerData, this.leader)) {
+    console.log("connecting", data);
+
+    //If player is the leader
+    if(data.playerData.isLeader && Player.isTheSame(data.playerData, this.leader)) {
       player = this.leader;
       this.setLeaderListeners(socket);
-    }else {
+
+    //If player was previously connected  
+    } else if (this.players[data.playerData.username] && Player.isTheSame(data.playerData, this.players[data.playerData.username])) {
+      player = this.players[data.playerData.username];
+
+    //If it's a new player
+    } else {
       player = new Player(data.playerData.username, this);
-      player.generateToken();
     }
 
     player.setSocket(socket);
@@ -69,7 +82,7 @@ class Room {
 
     this.syncPlayersData();
 
-    this.sendResponse("connectToRoomResponse", socket, player.serialize());
+    Room.sendResponse("connectToRoomResponse", socket, {roomCode: this.code, playerData: player.serialize(true)});
   }
 
   syncPlayersData(){
@@ -78,16 +91,22 @@ class Room {
 
   getPlayerList(){
     let playerList = [];
+    if(!this.game.started) playerList.push(this.leader.serialize());
     Object.keys(this.players).forEach(key => {
+      if(!this.game.started && this.players[key].isLeader) return;
       playerList.push(this.players[key].serialize()); 
     });
-    playerList.sort((a,b) => a.score < b.score ? 1 : -1);
+    if(this.game.started) {
+      console.log("the game has started, sorting player list");
+      playerList.sort((a,b) => a.score < b.score ? 1 : -1);
+    } 
     return playerList;
   }
 
   syncRoomState(socket = this.ioChannel){
     let roomState = {
       currentlyIn: this.game.started ? "game" : "lobby",
+      playlist: this.playlistInfo
     };
     if(this.game.started) {
       roomState.game = this.game.getGameState();
@@ -106,6 +125,14 @@ class Room {
     return generatedCode;
   }
 
+  static findRoomAndConnect(data, socket) {
+    const room = Room.rooms[data.code];
+    if(room){
+      room.connectPlayer(data, socket);
+    } else {
+      Room.sendResponse("connectToRoomResponse", socket, {error: "not found"}, 404);
+    }
+  }
 
 
 }

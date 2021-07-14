@@ -1,80 +1,102 @@
 <script>
+  import { onMount } from 'svelte';
+  
   export let socket;
-  export let gameIsStarting;
+  export let roomState;
 
-  let roundInProgress = false;
-  let showRoundResults = false;
-  let roundData = {};
   let choicesButtonsData = [];
+
   let choosenChoice = false;
   let correctChoice = false;
   let wrongChoice = false;
+  
+  let songQueuedToPlay = false;
+
+  let showRoundResults = false;
+
   let timeRemaining = 0;
 
   let nextRoundStartsIn;
-
-  let roundResults = {};
 
   let volume = 50;
 
   let audioElement;
 
-  socket.on('startingRound', data => {
-    roundData = data;
+  $: trackRoomStateChange(roomState);
 
-    roundInProgress = true;
-    showRoundResults = false;
-    gameIsStarting = false;
+  function trackRoomStateChange(state) {
+    console.log('trackRoomStateChange', state);
+    if(!state.game) return;
+    switch(state.game.currentRound.currentPhase) {
+      case 'playing':
+        choosenChoice = false;
+        correctChoice = false;
+        wrongChoice = false;
 
-    choosenChoice = false;
-    correctChoice = false;
-    wrongChoice = false;
+        showRoundResults = false;
 
-    audioElement.src = data.trackToPlay;
-    audioElement.volume = volume/100;
-    audioElement.play();
+        if(audioElement){
+          audioElement.src = state.game.currentRound.trackToPlay;
+          audioElement.volume = volume/100;
+          audioElement.play();
+        } else {
+          songQueuedToPlay = true;
+        }
+        
 
-    choicesButtonsData = formatChoices(data);
+        choicesButtonsData = formatChoices(state.game.currentRound);
 
-    timeRemaining = roundData.remainingTime;
-    const timer = setInterval(() => {
-      timeRemaining-=1;
-      if(timeRemaining <= 0){
-        clearInterval(timer);
-        timeEnded();
-      } 
-    }, 1000);
-  });
+        timeRemaining = state.game.currentRound.remainingTime;
+        const timer = setInterval(() => {
+          timeRemaining-=1;
+          if(timeRemaining <= 0){
+            clearInterval(timer);
+            timeEnded();
+          } 
+        }, 1000);
+        break;
 
-  function timeEnded() {
-    audioElement.pause();
-    audioElement.currentTime = 0;
+      case 'results':
+        correctChoice = state.game.currentRound.correctChoice
+        if(choosenChoice !== false && choosenChoice != correctChoice){
+          wrongChoice = choosenChoice;
+        }
+
+        console.log({correctChoice, wrongChoice, choosenChoice});
+        choosenChoice = false;
+
+        nextRoundStartsIn = state.game.currentRound.timeRemainingForNextRound;
+        const nextRoundTimer = setInterval(() => {
+          nextRoundStartsIn-=1;
+          if(nextRoundStartsIn <= 0){
+            clearInterval(nextRoundTimer);
+          } 
+        }, 1000);
+
+        setTimeout(() => {
+          showRoundResults = true;
+        }, 1000);
+
+        break;
+
+      default:
+        break;
+    }
   }
 
-  socket.on('roundResult', result => {
-    roundResults = result;
-    if(result.gotItRight){
-      correctChoice = choosenChoice;
-    } else {
-      correctChoice = result.correctChoice;
-      wrongChoice = choosenChoice;
+  onMount(() => {
+		if(songQueuedToPlay){
+      audioElement.play();
+      songQueuedToPlay = false;
     }
-    choosenChoice = false;
+	});
 
-    nextRoundStartsIn = result.nextRoundStartingIn;
-
-    const nextRoundTimer = setInterval(() => {
-      nextRoundStartsIn-=1;
-      if(nextRoundStartsIn <= 0){
-        clearInterval(nextRoundTimer);
-      } 
-    }, 1000);
-
-    setTimeout(() => {
-      showRoundResults = true;
-      roundInProgress = false;
-    }, 1000);
-  });
+  function timeEnded() {
+    if(audioElement){
+      audioElement.pause();
+      audioElement.currentTime = 0;
+    }
+  }
 
   function formatChoices(data) {
     const output = [];
@@ -107,19 +129,19 @@
 </script>
 
 <div class="text-center">
-  {#if gameIsStarting}
+  {#if !roomState.game}
     <div class="spinner-border" role="status">
       <span class="sr-only">Loading...</span>
     </div>
-  {:else if roundInProgress}
+  {:else if roomState.game.currentRound.currentPhase == 'playing' || !showRoundResults}
 
-    <h2>Round {roundData.number+1}</h2>
+    <h2>Round {roomState.game.currentRound.number+1}</h2>
 
     {#if timeRemaining}
     <h3 class="text-secondary">{timeRemaining} seconds</h3>
     {/if}
 
-    <h2>{roundData.type == "artist" ? "Guess the artist(s)" : "Guess the song"}</h2>
+    <h2>{roomState.game.currentRound.type == "artist" ? "Guess the artist(s)" : "Guess the song"}</h2>
 
     {#each choicesButtonsData as choiceButtonText, i}
       <button 
@@ -137,13 +159,13 @@
     {/each}
 
     <input type="range" class="volume-input" value={volume} on:input={handleVolumeInput} min="0" max="100">
-  {:else if showRoundResults}
+  {:else if roomState.game.currentRound.currentPhase == 'results'}
     <h3>Round results:</h3>
     <ul class="list-group">
-      {#each roundResults.playersThatGotItRight as player, i}
+      {#each roomState.game.currentRound.playersThatGotItRight as player, i}
       <li class="list-group-item">{i+1}º {player.username} - {player.score} pts</li>
       {/each}
-      {#if !roundResults.playersThatGotItRight.length}
+      {#if !roomState.game.currentRound.playersThatGotItRight.length}
       <li class="list-group-item">No one got it right :(</li>
       {/if}
     </ul>
@@ -151,7 +173,9 @@
   {/if}
 </div>
 
-<audio bind:this={audioElement}>
+<audio bind:this={audioElement}
+ src={roomState.game && roomState.game.currentRound.trackToPlay}
+ volume={volume/100}>
   <track kind="captions">
 </audio>
 

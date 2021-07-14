@@ -1,37 +1,46 @@
 <script>
   import { push } from 'svelte-spa-router';
-  import { io } from 'socket.io-client';
+
   import Lobby from './Lobby.svelte';
   import Game from './Game.svelte';
 
   export let params;
+  export let socket;
 
   let roomState = {
     currentlyIn: "lobby"
   };
 
+  let roomIsLoading = true;
   let gameIsStarting = false;
   let playersData = [];
-  let playerData = JSON.parse(sessionStorage.getItem('playerData'));;
+  
+  const lastRoomJoined = localStorage.getItem('lastRoomJoined');
+  let playerData = JSON.parse(localStorage.getItem('playerData'));;
 
-  const roomCode = sessionStorage.getItem('roomCode');
-
-  if(params.roomCode != roomCode){
+  if(params.roomCode == lastRoomJoined && playerData){
+    connectToRoom(params.roomCode, playerData);
+  } else {
     push(`/play/join/${params.roomCode}`);
   }
-
-  const socket = io(`${__songQuiz.env.SERVER_URL}`);
 
   function connectToRoom(code, playerData){
     socket.emit('initialSetup', {action:'connectToRoom', code, playerData});
     socket.on('connectToRoomResponse', response => {
-      playerData = response.playerData;
+      if(response.status === 200){
+        playerData = response.playerData;
+        localStorage.setItem('playerData', JSON.stringify(response.playerData) );
+
+        roomIsLoading = false;
+      } else {
+        if(response.status === 404) window.alert(`Room ${code} does not exist`);
+        push('/play');
+      } 
     });
   }
 
-  connectToRoom(roomCode, playerData);
-
   socket.on('syncPlayersData', players => {
+    console.log(players);
     playersData = players;
   });
 
@@ -49,18 +58,25 @@
 <main>
   <div class="mb-2"></div>
   <div class="room-wrapper">
+    {#if roomIsLoading}
+      <div class="app-window w-100 text-center">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    {:else}
     <div class="left-window app-window">
 
     </div>
     <div class="main-window app-window">
       {#if roomState.currentlyIn == "lobby" }
-      <Lobby {socket} {playerData} />
+      <Lobby {socket} {playerData} {roomState} />
       {:else if roomState.currentlyIn == "game"}
-      <Game {socket} {gameIsStarting}/>
+      <Game {socket} {roomState}/>
       {/if}
     </div>
     <div class="right-window app-window text-center">
-      <h3>Room {roomCode}</h3>
+      <h3>Room {params.roomCode}</h3>
       <hr>
       <div class="d-flex flex-row align-items-center mb-2">
         <h5>Players</h5>
@@ -68,12 +84,15 @@
       </div>
       {#each playersData as player, i}
       <div class="player-card mb-2">
-        <span>{i+1}.</span>
+        <i class="fas fa-circle" class:connected={player.isConnected} class:disconnected={!player.isConnected}></i>
+        {#if roomState.currentlyIn == "game"}<span>{i+1}.</span>{/if}
         <strong class="mr-1" >{player.username}</strong>
-        <span class="mx-1" >{player.score} points</span>
+        {#if player.isLeader}<i class="fas fa-crown text-warning"></i>{/if}
+        {#if roomState.currentlyIn == "game"}<span class="mx-1" >{player.score} points</span>{/if}
       </div>
       {/each}
     </div>
+    {/if}
   </div>
 </main>
 
@@ -106,5 +125,20 @@
     padding: 10px;
     border-radius: 10px;
   }
+
+  .spinner-border {
+    width: 192px;
+    height: 192px;
+    border-width: 0.5em;
+  }
+
+  .connected {
+    color: green;
+  }
+
+  .disconnected {
+    color: red;
+  }
+
 
 </style>

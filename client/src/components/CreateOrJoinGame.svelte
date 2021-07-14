@@ -1,12 +1,11 @@
 <script>
 	import {createEventDispatcher} from 'svelte';
-  import { io } from "socket.io-client";
+import { push } from 'svelte-spa-router';
 
 	export let params = undefined;
+	export let socket;
 
 	const dispatch = createEventDispatcher();
-
-  let socket;
 
 	let roomCodeRequired = true;
 
@@ -21,8 +20,6 @@
 	function handleFormSubmit(e) {
 		roomCodeRequired = true;
 
-    socket = io(`${__songQuiz.env.SERVER_URL}`);
-
     const action = e.submitter.getAttribute('action');
 
     switch(action){
@@ -30,38 +27,27 @@
         createRoom();
         break;
       case "joinRoom":
-        storeAndRedirectToRoom({roomCode, playerData: {username}});
+				joinRoom({roomCode, playerData: {username}});
         break;
       default:
         break;
     }
 	}
 
-  function createRoom(){
-    const data = { action: 'createRoom', username }
-    socket.emit('initialSetup', data);
+  function createRoom() {
+    socket.emit('initialSetup', { action: 'createRoom', username });
     socket.on('createRoomResponse', response => {
-      if(response.status === "success"){
-				storeAndRedirectToRoom(response);
+      if(response.status === 200){
+				joinRoom(response)
       }
-    })
+    });
   }
 
-	function storeAndRedirectToRoom(response){
-		socket.disconnect();
-
-		console.log(response);
-
-		sessionStorage.setItem('roomCode', response.roomCode );
-		sessionStorage.setItem('playerData', JSON.stringify(response.playerData) );
-		
-		dispatch("routeEvent", {
-			action: "redirectToRoom",
-			roomCode: response.roomCode,
-		});
-
+	function joinRoom(data) {
+		localStorage.setItem('lastRoomJoined', data.roomCode);
+		localStorage.setItem('playerData', JSON.stringify(data.playerData) );
+		push(`/play/room/${data.roomCode}`);
 	}
-
 
 </script>
 
