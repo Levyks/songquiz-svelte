@@ -3,6 +3,8 @@
 
   import Lobby from './Lobby.svelte';
   import Game from './Game.svelte';
+  import LeftWindow from './LeftWindow.svelte';
+  import RightWindow from './RightWindow.svelte';
 
   export let params;
   export let socket;
@@ -12,6 +14,7 @@
   };
 
   let roomIsLoading = true;
+
   let playersData = [];
   
   const lastRoomJoined = localStorage.getItem('lastRoomJoined');
@@ -38,9 +41,6 @@
     });
   }
 
-  socket.on('syncPlayersData', players => {
-    playersData = players;
-  });
 
   socket.on('syncRoomState', data => {
     roomState = data;
@@ -48,6 +48,10 @@
 
   socket.on('startingGame', () => {
     roomState.currentlyIn = "game";
+  });
+
+  socket.on('syncPlayersData', players => {
+    playersData = players;
   });
 
 </script>
@@ -63,31 +67,17 @@
       </div>
     {:else}
     <div class="left-window app-window">
-
+      <LeftWindow {socket} />
     </div>
-    <div class="main-window app-window">
+    <div class="main-window app-window text-left">
       {#if roomState.currentlyIn == "lobby" }
       <Lobby {socket} {playerData} {roomState} />
       {:else if roomState.currentlyIn == "game"}
       <Game {socket} {roomState}/>
       {/if}
     </div>
-    <div class="right-window app-window text-center">
-      <h3>Room {params.roomCode}</h3>
-      <hr>
-      <div class="d-flex flex-row align-items-center mb-2">
-        <h5>Players</h5>
-        <h6 class="ml-auto">{playersData.length} online</h6>
-      </div>
-      {#each playersData as player, i}
-      <div class="player-card mb-2">
-        <i class="fas fa-circle" class:connected={player.isConnected} class:disconnected={!player.isConnected}></i>
-        {#if roomState.currentlyIn == "game"}<span>{i+1}.</span>{/if}
-        <strong class="mr-1" >{player.username}</strong>
-        {#if player.isLeader}<i class="fas fa-crown text-warning"></i>{/if}
-        {#if roomState.currentlyIn == "game"}<span class="mx-1" >{player.score} points</span>{/if}
-      </div>
-      {/each}
+    <div class="right-window app-window">
+      <RightWindow {roomState} {playersData} roomCode={params.roomCode} />
     </div>
     {/if}
   </div>
@@ -95,32 +85,32 @@
 
 <style>
   .room-wrapper {
+    text-align: center;
     display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .left-window {
     flex-grow: 1;
+    min-width: 300px;
   }
 
   .main-window {
-    flex-grow: 2;
+    flex-grow: 4;
+    min-width: 300px;
   }
 
   .right-window {
     flex-grow: 1;
+    min-width: 300px;
   }
 
   .app-window {
     border-radius: 10px;
-    margin: 0 10px;
+    margin: 10px 10px;
     padding: 10px;
     background-color: white;
-  }
-
-  .player-card {
-    background-color: #eaeaea;
-    padding: 10px;
-    border-radius: 10px;
   }
 
   .spinner-border {
@@ -129,13 +119,10 @@
     border-width: 0.5em;
   }
 
-  .connected {
-    color: green;
+  @media only screen and (max-width: 1000px) {
+  .main-window {
+    order: -1;
+    width: 100%;
   }
-
-  .disconnected {
-    color: red;
-  }
-
-
+}
 </style>
