@@ -128,35 +128,42 @@
 
 </script>
 
-<div class="text-center">
+<div class="game-wrapper">
   {#if !roomState.game}
     <div class="spinner-border" role="status">
       <span class="sr-only">Loading...</span>
     </div>
   {:else if roomState.game.currentRound.currentPhase == 'playing' || !showRoundResults}
 
-    <h2>Round {roomState.game.currentRound.number+1}</h2>
+    <div class="game-header">
+      <h2>Round {roomState.game.currentRound.number+1}</h2>
 
-    {#if timeRemaining}
-    <h3 class="text-secondary">{timeRemaining} seconds</h3>
-    {/if}
+      {#if timeRemaining}
+      <h3 class="text-secondary">{timeRemaining} seconds</h3>
+      {/if}
+      
+      <hr>
+      <h2>{roomState.game.currentRound.type == "artist" ? "Guess the artist(s)" : "Guess the song"}</h2>
+    </div>
 
-    <h2>{roomState.game.currentRound.type == "artist" ? "Guess the artist(s)" : "Guess the song"}</h2>
-
-    {#each choicesButtonsData as choiceButtonText, i}
-      <button 
-        class={`btn choice-btn ${
-          i === correctChoice ? 'btn-success' : 
-          i === wrongChoice ? 'btn-danger' : 
-          i === choosenChoice ? 'btn-secondary' : 
-          'btn-light'}`} 
-          
-        value={i} 
-        on:click={handleChoiceClick}
-        disabled={!!choosenChoice}>
-          {choiceButtonText}
-        </button>
-    {/each}
+    <div class="game-main">
+      <div class="choices-wrapper">
+      {#each choicesButtonsData as choiceButtonText, i}
+        <button 
+          class={`btn choice-btn ${
+            i === correctChoice ? 'btn-success' : 
+            i === wrongChoice ? 'btn-danger' : 
+            i === choosenChoice ? 'btn-secondary' : 
+            'btn-light'}`} 
+            
+          value={i} 
+          on:click={handleChoiceClick}
+          disabled={!!choosenChoice}>
+            {choiceButtonText}
+          </button>
+      {/each}
+      </div>
+    </div>
 
     <input type="range" class="volume-input" value={volume} on:input={handleVolumeInput} min="0" max="100">
   {:else if roomState.game.currentRound.currentPhase == 'results'}
@@ -180,6 +187,14 @@
 </audio>
 
 <style>
+  .game-wrapper {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+
   .choice-btn {
     width: 100%;
     border-color: rgb(0 0 0 / 50%);
@@ -189,9 +204,11 @@
     width: 192px;
     height: 192px;
     border-width: 0.5em;
+    margin: auto;
   }
 
   .volume-input {
     width: 100%;
   }
+
 </style>

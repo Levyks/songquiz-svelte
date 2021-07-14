@@ -73,6 +73,8 @@ class Round {
       }
     }, TIME_BETWEEN_ROUNDS * 1000);
 
+    this.room.ioChannel.emit('addSongToHistory', this.choices[this.correctChoice]);
+
     this.room.syncRoomState();
     this.room.syncPlayersData();
   }

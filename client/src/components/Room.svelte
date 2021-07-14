@@ -69,7 +69,7 @@
     <div class="left-window app-window">
       <LeftWindow {socket} />
     </div>
-    <div class="main-window app-window text-left">
+    <div class="main-window app-window">
       {#if roomState.currentlyIn == "lobby" }
       <Lobby {socket} {playerData} {roomState} />
       {:else if roomState.currentlyIn == "game"}
@@ -91,25 +91,18 @@
     flex-wrap: wrap;
   }
 
-  .left-window {
-    flex-grow: 1;
-    min-width: 300px;
-  }
-
   .main-window {
-    flex-grow: 4;
-    min-width: 300px;
-  }
-
-  .right-window {
-    flex-grow: 1;
-    min-width: 300px;
+    flex-grow: 2!important;
   }
 
   .app-window {
+    flex-basis: 0;
+    flex-grow: 1;
+    flex-shrink: 1;
     border-radius: 10px;
     margin: 10px 10px;
     padding: 10px;
+    min-width: 300px;
     background-color: white;
   }
 
@@ -119,10 +112,30 @@
     border-width: 0.5em;
   }
 
-  @media only screen and (max-width: 1000px) {
-  .main-window {
-    order: -1;
-    width: 100%;
+  @media only screen and (max-width: 1200px) {
+    .main-window {
+      order: -1;
+      flex: 0 0 100%;
+    }
+
+    .left-window {
+      margin-left: 0;
+    }
+
+    .right-window {
+      margin-right: 0;
+    }
   }
-}
+
+  @media only screen and (max-width: 700px) {
+    .app-window {
+      flex: 0 0 100%;
+    }
+    .left-window {
+      margin-right: 0;
+    }
+    .right-window {
+      margin-left: 0;
+    }
+  }
 </style>

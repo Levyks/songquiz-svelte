@@ -10,6 +10,7 @@
   <h5>Players</h5>
   <h6 class="ml-auto">{playersData.length} online</h6>
 </div>
+<div class="players-wrapper">
 {#each playersData as player, i}
   <div class="player-card mb-2">
     <i class="fas fa-circle" class:connected={player.isConnected} class:disconnected={!player.isConnected}></i>
@@ -19,12 +20,18 @@
     {#if roomState.currentlyIn == "game"}<span class="mx-1" >{player.score} points</span>{/if}
   </div>
 {/each}
+</div>
 
 <style>
   .player-card {
     background-color: #eaeaea;
     padding: 10px;
     border-radius: 10px;
+  }
+
+  .players-wrapper {
+    overflow-y: auto;
+    max-height: 430px;
   }
 
   .connected {
