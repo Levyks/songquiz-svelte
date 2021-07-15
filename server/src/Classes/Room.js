@@ -84,6 +84,7 @@ class Room {
       this.players[key].score = 0;
     });
     this.syncRoomState();
+    this.syncPlayersData();
   }
 
   connectPlayer(data, socket) {

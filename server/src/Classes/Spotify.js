@@ -109,7 +109,7 @@ class Spotify {
     return urlParts[2];
   }
 
-  static getAccessToken() {
+  static getAccessToken(secondTry = false) {
     console.log("Requesting new access token");
     return axios({
       method: "post",
@@ -122,7 +122,8 @@ class Spotify {
       Spotify.accessToken = response.data.access_token;
       return Spotify.accessToken;
     }).catch(error => {
-      console.log(error);
+      console.log("An error occurred while requesting access token");
+      if(!secondTry) return Spotify.getAccessToken(true);
     });
   }
 }
