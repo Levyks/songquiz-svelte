@@ -120,7 +120,6 @@ class Spotify {
       }
     }).then(response => {
       Spotify.accessToken = response.data.access_token;
-      fs.writeFileSync('./token.json', JSON.stringify({access_token: Spotify.accessToken}));
       return Spotify.accessToken;
     }).catch(error => {
       console.log(error);
@@ -128,21 +127,4 @@ class Spotify {
   }
 }
 
-module.exports = Spotify
-
-Spotify.accessToken = JSON.parse(fs.readFileSync('./token.json')).access_token;
-
-/*
-var t0 = performance.now()
-
-Spotify.getPlaylistTracks("https://open.spotify.com/playlist/37i9dQZF1DX0FOF1IUWK1W?si=6a366ec92bc249de").then(playlistInfo => {
-  var t1 = performance.now()
-  console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.")
-});
-//asd sad
-
-/*
-
-*/
-
-//Spotify.getPlaylistTracks("https://open.spotify.com/playlist/37i9dQZF1DX0FOF1IUWK1W?si=6a366ec92bc249de").then(console.log);
+module.exports = Spotify;

@@ -25,7 +25,6 @@
   $: trackRoomStateChange(roomState);
 
   function trackRoomStateChange(state) {
-    console.log(state);
     if(!state.game) return;
     switch(state.game.currentRound.currentPhase) {
       case 'playing':
