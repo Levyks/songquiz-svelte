@@ -116,7 +116,7 @@
     margin: 10px 10px;
     padding: 10px;
     min-width: 300px;
-    min-height: 500px;
+    height: 600px;
     background-color: white;
   }
 
@@ -146,7 +146,7 @@
     }
 
     .app-window {
-      min-height: none;
+      height: none;
     }
   }
 
