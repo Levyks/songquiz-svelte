@@ -80,6 +80,9 @@ class Room {
     this.log("Going back to the lobby");
     this.currentlyIn = 'lobby';
     this.game = new Game(this);
+    Object.keys(this.players).forEach(key => {
+      this.players[key].score = 0;
+    });
     this.syncRoomState();
   }
 
