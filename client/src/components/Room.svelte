@@ -3,6 +3,7 @@
 
   import Lobby from './Lobby.svelte';
   import Game from './Game.svelte';
+  import FinalResults from './FinalResults.svelte';
   import LeftWindow from './LeftWindow.svelte';
   import RightWindow from './RightWindow.svelte';
 
@@ -84,6 +85,8 @@
       <Lobby {socket} {playerData} {roomState} />
       {:else if roomState.currentlyIn == "game"}
       <Game {socket} {roomState}/>
+      {:else if roomState.currentlyIn == "finalResults"}
+      <FinalResults {socket} {playerData} {roomState}/>
       {/if}
     </div>
     <div class="right-window app-window">
@@ -113,6 +116,7 @@
     margin: 10px 10px;
     padding: 10px;
     min-width: 300px;
+    min-height: 500px;
     background-color: white;
   }
 
@@ -139,6 +143,10 @@
 
     .right-window {
       margin-right: 0;
+    }
+
+    .app-window {
+      min-height: none;
     }
   }
 

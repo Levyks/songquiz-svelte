@@ -18,13 +18,14 @@
 
   let nextRoundStartsIn;
 
-  let volume = 50;
+  let volume = parseInt(localStorage.getItem('defaultVolume')) || 50;
 
   let audioElement;
 
   $: trackRoomStateChange(roomState);
 
   function trackRoomStateChange(state) {
+    console.log(state);
     if(!state.game) return;
     switch(state.game.currentRound.currentPhase) {
       case 'playing':
@@ -74,6 +75,8 @@
         setTimeout(() => {
           showRoundResults = true;
         }, 1000);
+
+        localStorage.setItem('defaultVolume', volume);
 
         break;
 
@@ -156,7 +159,7 @@
             
           value={i} 
           on:click={handleChoiceClick}
-          disabled={!!choosenChoice}>
+          disabled={!!choosenChoice || roomState.game.currentRound.currentPhase == 'results'}>
             {choiceButtonText}
           </button>
       {/each}
@@ -174,7 +177,7 @@
       <li class="list-group-item">No one got it right :(</li>
       {/if}
     </ul>
-    <h4 class="text-secondary">Next round starts in {nextRoundStartsIn}</h4>
+    <h4 class="text-secondary">{roomState.game.currentRound.lastOne ? "Final results in" : "Next round starts in"} {nextRoundStartsIn}</h4>
   {/if}
 </div>
 

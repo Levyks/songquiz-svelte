@@ -114,7 +114,8 @@ class Round {
         number: this.roundNumber,
         playersThatGotItRight: this.playersThatGotItRight,
         correctChoice: this.correctChoice,
-        timeRemainingForNextRound: this.getTimeRemainingForNextRound()
+        timeRemainingForNextRound: this.getTimeRemainingForNextRound(),
+        lastOne: this.roundNumber == (this.game.numberOfRounds - 1)
       }
     }
     return roundState;

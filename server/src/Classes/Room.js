@@ -72,9 +72,15 @@ class Room {
     socket.on("setNumberOfRounds", (numberOfRounds) => {this.setNumberOfRounds(numberOfRounds)});
     socket.on("setTimePerRound", (timePerRound) => {this.setTimePerRound(timePerRound)});
 
-    socket.on("startGame", (data) => {
-      this.game.startGame();
-    })
+    socket.on("startGame", () => {this.game.startGame()});
+    socket.on("backToLobby", () => {this.backToLobby()});
+  }
+
+  backToLobby() {
+    this.log("Going back to the lobby");
+    this.currentlyIn = 'lobby';
+    this.game = new Game(this);
+    this.syncRoomState();
   }
 
   connectPlayer(data, socket) {

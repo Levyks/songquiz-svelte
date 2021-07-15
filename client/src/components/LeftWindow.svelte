@@ -29,6 +29,7 @@
 </script>
 
 <h3>You've just listen to</h3>
+<hr>
 <ul class="list-group">
   {#each songs as song}
   <a href={song.href} target="_blank">

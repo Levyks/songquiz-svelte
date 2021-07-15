@@ -34,7 +34,17 @@ class Game {
     })
   }
 
+  endGame() {
+    this.room.log("Game has ended");
+    this.room.currentlyIn = "finalResults";
+    this.room.syncRoomState();
+  }
+
   startRound(roundNumber) {
+    if(roundNumber >= this.numberOfRounds) {
+      this.endGame();
+      return;
+    }
     const round = new Round(roundNumber, this);
     this.rounds.push(round);
     this.currentRound = round;
@@ -42,9 +52,10 @@ class Game {
   }
 
   getGameState(){
-    let gameState = {
-      currentRound: this.currentRound.getRoundState()
-    }
+    let gameState = {};
+    if(this.room.currentlyIn == "game") gameState.currentRound = this.currentRound.getRoundState()
+    else if(this.room.currentlyIn == "finalResults") gameState.results = this.room.getPlayerList();
+
     return gameState;
   }
 
