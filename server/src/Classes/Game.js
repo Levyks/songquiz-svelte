@@ -10,17 +10,18 @@ class Game {
   }
 
   startGame() {
-    this.timePerRound = 15;
 
     this.room.log("Starting Game");
     this.room.currentlyIn = 'game';
     this.room.syncRoomState();
 
-
     this.playlistUrl = this.room.playlistUrl;
     this.playlist = this.room.playlist;
 
     if(!this.playlist) return;
+
+    this.numberOfRounds = this.room.numberOfRounds;
+    this.timePerRound = this.room.timePerRound;
 
     this.room.log("Starting to fetch tracks");
 

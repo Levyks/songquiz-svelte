@@ -3,24 +3,28 @@ const Game = require("./Game");
 const Spotify = require('./Spotify');
 
 const TIME_BEFORE_DELETING_ROOM = 30
+const DEFAULT_NUMBER_OF_ROUNDS = 10;
+const DEFAULT_TIME_PER_ROUND = 15;
 
 class Room {
   static rooms = {}
 
   constructor(socket, username) {
+    this.deletionTimeOut = false;
+    this.players = {};
+    this.currentlyConnectedPlayers = 0;
+
+    this.numberOfRounds = DEFAULT_NUMBER_OF_ROUNDS;
+    this.timePerRound = DEFAULT_TIME_PER_ROUND;
+
     this.code = Room.getUniqueRoomCode(); 
     this.ioChannel = Room.io.in(this.code);
 
     Room.rooms[this.code] = this;
-
-    this.deletionTimeOut = false;
-
-    this.game = new Game(this);
-
+    
     this.currentlyIn = 'lobby';
 
-    this.players = {};
-    this.currentlyConnectedPlayers = 0;
+    this.game = new Game(this);
 
     this.leader = new Player(username, this);
     this.leader.isLeader = true;
@@ -30,10 +34,17 @@ class Room {
     Room.sendResponse("createRoomResponse", socket, {roomCode: this.code, playerData: this.leader.serialize(true)});
   }
 
-  async setPlaylist(data){
-    this.playlistUrl = data.playlistUrl;
+  static sendResponse(responseName, socket, data, status = 200) {
+    socket.emit(responseName, {
+      status: status,
+      ...data, 
+    });
+  }
 
-    this.playlist = this.playlistUrl !== '' ? await Spotify.getPlaylistInfo(data.playlistUrl) : undefined;
+  async setPlaylist(playlistUrl) {
+    this.playlistUrl = playlistUrl;
+
+    this.playlist = this.playlistUrl !== '' ? await Spotify.getPlaylistInfo(this.playlistUrl) : undefined;
     this.playlistSet = this.playlist && this.playlist.status === 200;
     this.syncRoomState();
 
@@ -43,15 +54,24 @@ class Room {
       `Playlist unset`);
   }
 
-  static sendResponse(responseName, socket, data, status = 200) {
-    socket.emit(responseName, {
-      status: status,
-      ...data, 
-    });
+  setNumberOfRounds(numberOfRounds) {
+    if(isNaN(numberOfRounds)) return;
+    this.numberOfRounds = Math.max(1, Math.ceil(numberOfRounds));
+    this.syncRoomState();
   }
 
+  setTimePerRound(timePerRound) {
+    if(isNaN(timePerRound)) return;
+    this.timePerRound = Math.max(5, Math.ceil(timePerRound));
+    this.syncRoomState();
+  }
+  
+
   setLeaderListeners(socket){
-    socket.on("setPlaylist", (data) => {this.setPlaylist(data)});
+    socket.on("setPlaylist", (playlistUrl) => {this.setPlaylist(playlistUrl)});
+    socket.on("setNumberOfRounds", (numberOfRounds) => {this.setNumberOfRounds(numberOfRounds)});
+    socket.on("setTimePerRound", (timePerRound) => {this.setTimePerRound(timePerRound)});
+
     socket.on("startGame", (data) => {
       this.game.startGame();
     })
@@ -116,7 +136,9 @@ class Room {
   syncRoomState(socket = this.ioChannel) {
     let roomState = {
       currentlyIn: this.currentlyIn,
-      playlist: this.playlist
+      playlist: this.playlist,
+      numberOfRounds: this.numberOfRounds,
+      timePerRound: this.timePerRound
     };
     if(this.game.started) {
       roomState.game = this.game.getGameState();

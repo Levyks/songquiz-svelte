@@ -9,11 +9,23 @@
   let lastPlaylistUrlFetched = playlistUrl;
   let validPlaylistSet = false;
 
+  let numberOfRounds = roomState.numberOfRounds;
+  let lastNumberOfRounds = numberOfRounds;
+
+  let timePerRound = roomState.timePerRound;
+  let lastTimePerRound = timePerRound;
+
   let inviteFriendsUrlInput;
 
   $: trackRoomStateChange(roomState);
 
   function trackRoomStateChange(state) {
+    numberOfRounds = state.numberOfRounds;
+    lastNumberOfRounds = numberOfRounds;
+
+    timePerRound = state.timePerRound;
+    lastTimePerRound = timePerRound;
+
     isLoadingPlaylist = false;
   }
 
@@ -23,8 +35,25 @@
     isLoadingPlaylist = true;
     lastPlaylistUrlFetched = playlistUrl;
 
-    socket.emit('setPlaylist', {playlistUrl});
-      
+    socket.emit('setPlaylist', playlistUrl);
+  }
+
+  function handleNumberOfRoundsBlur(){
+    if(numberOfRounds === lastNumberOfRounds) return;
+
+    numberOfRounds = Math.max(1, Math.ceil(numberOfRounds));
+
+    lastNumberOfRounds = numberOfRounds;
+    socket.emit('setNumberOfRounds', numberOfRounds);
+  }
+
+  function handleTimePerRoundBlur(){
+    if(timePerRound === lastTimePerRound) return;
+
+    timePerRound = Math.max(5, Math.ceil(timePerRound));
+
+    lastTimePerRound = timePerRound;
+    socket.emit('setTimePerRound', timePerRound);
   }
 
   function handleCopyUrlClick(){
@@ -80,7 +109,22 @@
       <input class="form-control" on:blur={handlePlaylistUrlBlur} bind:value={playlistUrl} placeholder="An spotify playlist URL" id="playlist-url-input">
       {/if}
 
-    </div>  
+    </div> 
+    
+    <div class="row">
+      <div class="col">
+        <div class="form-group">
+          <label for="number-of-rounds-input">Number of rounds</label>
+          <input type="number" min="1" max="30" on:blur={handleNumberOfRoundsBlur} bind:value={numberOfRounds} readonly={!playerData.isLeader} class="form-control" id="number-of-rounds-input">
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group">
+          <label for="time-per-round-input">Time per round (in seconds)</label>
+          <input type="number" min="5" on:blur={handleTimePerRoundBlur} bind:value={timePerRound} readonly={!playerData.isLeader} class="form-control" id="time-per-round-input">
+        </div>
+      </div>
+    </div>
 
     <div class="form-group">
       <label for="invite-friends-input">Invite friends</label>

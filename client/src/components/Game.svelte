@@ -25,7 +25,6 @@
   $: trackRoomStateChange(roomState);
 
   function trackRoomStateChange(state) {
-    console.log('trackRoomStateChange', state);
     if(!state.game) return;
     switch(state.game.currentRound.currentPhase) {
       case 'playing':
@@ -62,7 +61,6 @@
           wrongChoice = choosenChoice;
         }
 
-        console.log({correctChoice, wrongChoice, choosenChoice});
         choosenChoice = false;
 
         nextRoundStartsIn = state.game.currentRound.timeRemainingForNextRound;
