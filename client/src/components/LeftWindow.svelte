@@ -30,7 +30,7 @@
 
 <h3>You've just listen to</h3>
 <hr>
-<ul class="list-group">
+<ul class="list-group text-left">
   {#each songs as song}
   <a href={song.href} target="_blank">
     <li class="list-group-item">
