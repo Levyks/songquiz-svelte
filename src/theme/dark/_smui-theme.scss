@@ -25,3 +25,11 @@ a {
 a:hover {
   color: color.scale(#bb86fc, $lightness: 35%);
 }
+
+.mdc-slider__value-indicator-text {
+  color: white;
+}
+
+.mdc-slider .mdc-slider__value-indicator {
+  opacity: .8 !important;
+}
