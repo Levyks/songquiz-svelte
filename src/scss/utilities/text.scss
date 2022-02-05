@@ -1,0 +1,11 @@
+.text-center {
+    text-align: center;
+}
+
+.color-inherit {
+    color: inherit;
+
+    &:hover {
+        color: inherit;
+    }
+}

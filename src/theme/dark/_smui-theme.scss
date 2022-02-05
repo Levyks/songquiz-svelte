@@ -1,0 +1,27 @@
+@use 'sass:color';
+
+@use '@material/theme/color-palette';
+
+// Svelte Colors! (Dark Theme)
+@use '@material/theme/index' as theme with (
+  $primary: #bb86fc,
+  $secondary: color.scale(#676778, $whiteness: -10%),
+  $surface: color.adjust(color-palette.$grey-900, $blue: +4),
+  $background: #282c34,
+  $error: color-palette.$red-700
+);
+
+@use '../typography.scss';
+
+html,
+body {
+  background-color: #282c34;
+  color: theme.$on-surface;
+}
+
+a {
+  color: #bb86fc;
+}
+a:hover {
+  color: color.scale(#bb86fc, $lightness: 35%);
+}
