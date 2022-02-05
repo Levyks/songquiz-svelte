@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Link } from "svelte-routing";
 
     import Card from '@smui/card';
     import Accordion, { Panel, Header, Content} from '@smui-extra/accordion';
