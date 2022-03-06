@@ -12,7 +12,9 @@
     import type { SnackbarComponentDev } from '@smui/snackbar';
     import type { TextfieldComponentDev } from '@smui/textfield';
 
-    const url = new URL('?join=1234', location.origin).href
+    import { room } from '@/stores';
+
+    const url = new URL(`/?join=${$room.code}`, location.origin).href
 
     let snackbar: SnackbarComponentDev;
     let textfield: TextfieldComponentDev;

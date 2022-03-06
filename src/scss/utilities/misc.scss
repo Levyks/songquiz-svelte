@@ -13,3 +13,15 @@
 .overflow-hidden {
     overflow: hidden;
 }
+
+.bg-success {
+    background-color: #4caf50!important;
+}
+
+.bg-error {
+    background-color: #f44336!important;
+}
+
+.transition-bg {
+    transition: background-color 0.5s ease-in-out;
+}

@@ -1,34 +1,57 @@
 <script lang="ts">
 
     import { navigate } from 'svelte-routing';
+    import type { AxiosError } from 'axios';
 
     import Textfield from '@smui/textfield';
     import Button, { Label } from '@smui/button';
 
     import UsernameField from './UsernameField.svelte';
     import LoadingDialog from '@/components/misc/LoadingDialog.svelte';
+    import AlertDialog from '@/components/misc/AlertDialog.svelte';
 
-    import { delay } from '@/helpers';
+    import { join } from '@/services/room.service';
 
     export let username: string;
     export let roomCode: string;
 
     let loading: boolean = false;
 
-    function join() {
+    let alertOpen: boolean = false;
+    let alertTitle: string;
+    let alertContent: string;
+
+    function handleJoin() {
         loading = true;
 
-        delay(1000).then(() => {
-            navigate(`/room/${roomCode}`);
-            loading = false;
-        });
-    }
+        return join(roomCode, username)
+            .then(() => {
+                navigate(`/room/${roomCode}`);
+            })
+            .catch((err: AxiosError) => {
 
+                let message = 'Unknown error';
+
+                if(err.isAxiosError) {
+                    message = err.response?.data?.message || message; 
+                }
+
+                alertTitle = 'Failed to join room';
+                alertContent = message;
+                alertOpen = true;
+
+            })
+            .finally(() => {
+                loading = false;
+            });
+    }
+    
 </script>
 
 <LoadingDialog open={loading} text="Joining..."/>
+<AlertDialog bind:open={alertOpen} title={alertTitle} content={alertContent}/>
 
-<form on:submit|preventDefault={join}>
+<form on:submit|preventDefault={handleJoin}>
     <UsernameField bind:username/>
     <Textfield
         label="Room code"

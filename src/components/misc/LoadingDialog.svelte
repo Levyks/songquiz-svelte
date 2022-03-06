@@ -14,5 +14,5 @@
     <div class="flex-center pt-5">
         <CircularProgress style="height: 64px; width: 64px;" indeterminate/> 
     </div>
-    <h4 class="text-center">{text}</h4>
+    <h4 class="text-center" tabindex="0">{text}</h4>
 </Dialog>

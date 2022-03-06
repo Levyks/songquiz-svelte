@@ -1,50 +1,48 @@
 <script lang="ts">  
-
-    import { Item, Graphic, Text} from '@smui/list';
     import { Icon } from '@smui/common';
 
-    import { getRandomBackgroundAndTextColor } from '@/helpers';
+    import PlayerIcon from '@/components/misc/PlayerIcon.svelte';
+    import type { Player } from '@/typings/room';
+    import { room, isLeader as isPlayerLeader } from '@/stores';
+    import PlayerLeaderMenu from './PlayerLeaderMenu.svelte';
 
-    export let player: {
-        name: string;
-        score: number;
-        isLeader: boolean;
-    }
+    export let player: Player;
 
-    const [backgroundColor, textColor] = getRandomBackgroundAndTextColor();
-
-    console.log(backgroundColor, textColor);
+    let isLeader: boolean;
+    $: isLeader = player.nickname === $room.leader
 
 </script>
 
-<Item activated={player.isLeader}>
-    <Graphic>
-        <div class="avatar" style="background-color: {backgroundColor}; color: {textColor}">
-            <span>{player.name.substring(0, 1)}</span>
-        </div>
-    </Graphic>
-    <Text>{player.name}</Text>
-    {#if player.isLeader}
+<div class="item d-flex align-items-center" class:leader={isLeader}>
+
+    <PlayerIcon {player} size={40}/>
+
+    <span class="ms-2">{player.nickname}</span>
+
+    {#if isLeader}
         <Icon class="material-icons ms-1">security</Icon>
     {/if}
-    <Text class="ms-auto" title="Score">
-        {player.score}
-    </Text>
-</Item>
+
+    <span class="ms-auto" title="Score">
+        {player.score} pt.
+    </span>
+
+    {#if $isPlayerLeader}
+        <PlayerLeaderMenu {player}/>
+    {/if}
+
+</div>
 
 
 <style lang="scss">
 
-    .avatar {
-        display: inline-block;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 40px;
-        font-size: 20px;
+    .item {
+        margin: 8px 0;
+    }
+
+    .leader {
+        color: var(--mdc-theme-primary);
         font-weight: bold;
-        color: white;
     }
 
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import Card from '@smui/card';
-    import SongCard from './history/SongCard.svelte';
+    import SongCard from './SongCard.svelte';
 
     const songs = new Array(5).fill({
         image: 'https://place-hold.it/320x320?text=square&fontsize=48',

@@ -1,24 +1,38 @@
 <script lang="ts">
     import Card from '@smui/card';
-    import Button, { Label } from '@smui/button';
+    import Button from '@smui/button';
 
-    import InviteSection from './lobby/InviteSection.svelte';
-    import PlaylistSection from './lobby/PlaylistSection.svelte';
-    import SettingsSection from './lobby/SettingsSection.svelte';
+    import InviteSection from './InviteSection.svelte';
+    import PlaylistSection from './PlaylistSection.svelte';
+    import SettingsSection from './SettingsSection.svelte';
+    import { room } from '@/stores';
+
+    let playlistSet: boolean;
+    let showPlaylistError: boolean = false;
+
+    function start() {
+
+        if(!playlistSet) {
+            showPlaylistError = true;
+            return;
+        }
+
+    }
+
 </script>
 
 <Card variant="outlined" class="h-100 p-3 overflow-hidden d-flex flex-column justify-content-between">
 
-    <h4 class="text-center m-4">Lobby <strong>2231</strong></h4>
+    <h4 class="text-center m-4">Lobby <strong>{$room.code}</strong></h4>
 
     <div class="sections mb-2">
-        <PlaylistSection />
+        <PlaylistSection bind:showPlaylistError bind:playlistSet />
         <SettingsSection />
         <InviteSection />
     </div>
 
     <div class="start-btn-wrapper">
-        <Button variant="raised" class="w-100" type="submit">
+        <Button variant="raised" class="w-100" on:click={start}>
             <span class="start-btn-label">Start Game</span>
         </Button>
     </div>

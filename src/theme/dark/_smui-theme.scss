@@ -11,6 +11,7 @@
   $error: color-palette.$red-700
 );
 
+@use '@material/circular-progress/index' as circular-progress;
 @use '../typography.scss';
 
 html,
@@ -32,4 +33,8 @@ a:hover {
 
 .mdc-slider .mdc-slider__value-indicator {
   opacity: .8 !important;
+}
+
+.surface-circular-progress {
+  @include circular-progress.color(theme.$surface);
 }

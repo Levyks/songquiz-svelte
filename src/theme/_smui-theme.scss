@@ -11,7 +11,16 @@
   $error: color-palette.$red-900
 );
 
+@use '@material/circular-progress/index' as circular-progress;
 @use './typography.scss';
+
+:root {
+  --mdc-theme-primary: #673ab7;
+  --mdc-theme-secondary: #676778;
+  --mdc-theme-background: #fff;
+  --mdc-theme-surface: #fff;
+  --mdc-theme-error: color-palette.$red-900;
+}
 
 html,
 body {
@@ -24,4 +33,8 @@ a {
 }
 a:hover {
   color: color.scale(#673ab7, $lightness: -35%);
+}
+
+.surface-circular-progress {
+  @include circular-progress.color(theme.$surface);
 }

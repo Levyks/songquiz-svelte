@@ -1,11 +1,30 @@
 <script lang="ts">
 
+    import { navigate } from 'svelte-routing';
+
     import DarkModeSwitch from '@/components/misc/DarkModeSwitch.svelte';
-    import History from '@/components/room/History.svelte';
-    import Lobby from '@/components/room/Lobby.svelte';
-    import Players from '@/components/room/Players.svelte';
+    import History from '@/components/room/history/History.svelte';
+    import Players from '@/components/room/players/Players.svelte';
+    
+    import Lobby from '@/components/room/lobby';
+    import Starting from '@/components/room/Starting.svelte';
+    import Round from '@/components/room/round';
+
+    import { room } from '@/stores';
+    import { connect } from '@/services/room.service';
 
     export let code: string;
+
+    const components = {
+        'lobby': Lobby,
+        'starting': Starting,
+        'round': Round,
+    }
+
+    if(!$room.isConnected) {
+        connect(code).catch(() => navigate(`/?join=${code}`));
+    }
+
 </script>
 
 <div class="d-flex justify-content-end mt-2 me-3">
@@ -13,15 +32,19 @@
 </div>
 
 <div class="grid">
-    <div class="cell history">
-        <History />
-    </div>
-    <div class="cell main">
-        <Lobby />
-    </div>
-    <div class="cell players">
-        <Players />
-    </div>
+    {#if $room.isConnected}
+        <div class="cell history">
+            <History />
+        </div>
+        <div class="cell main">
+            <svelte:component this={components[$room.status]} />
+        </div>
+        <div class="cell players">
+            <Players />
+        </div>
+    {:else}
+        sem conexão
+    {/if}
 </div>
 
 <style lang="scss">

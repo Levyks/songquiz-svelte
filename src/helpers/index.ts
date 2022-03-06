@@ -1,18 +1,28 @@
+import type { Color } from "@/typings/room";
+
 export function delay(ms: number): Promise<void> {
     return new Promise(resolve => {
         setTimeout(resolve, ms);
     });
 }
 
-export function getRandomBackgroundAndTextColor() {
+export function getTextColor(bg: Color): Color {
+    return (bg[0] * 0.299 + bg[1] * 0.587 + bg[2] * 0.114) > 186 ? 
+        [0, 0, 0] : 
+        [255, 255, 255];
+}
 
-    const red = Math.floor(Math.random() * 255);
-    const green = Math.floor(Math.random() * 255);
-    const blue = Math.floor(Math.random() * 255);
+export function getHtmlColor(color: Color) {
+    return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+}
 
-    const textColor = (red * 0.299 + green * 0.587 + blue * 0.114) > 186 ? '#000000' : '#ffffff';
 
-    const backgroundColor = '#' + [red, green, blue].map(x => x.toString(16).padStart(2, '0')).join('');
+export function playAudio(audioPath: string, volume: number = 0.5): HTMLAudioElement {
 
-    return [backgroundColor, textColor];
+    const audio = new Audio();
+    audio.volume = volume;
+    audio.autoplay = true;
+    audio.src = audioPath;
+    return audio;
+
 }
