@@ -1,5 +1,5 @@
 import type { RoomStatus, RoundType } from "@/enums";
-import type { GuessEventComponent, PlayerEventComponent, ResultsEventComponent, RoundEventComponent } from "./eventsComponents";
+import type { GuessEventComponent, PlayerEventComponent, ResultsEventComponent, RoundEventComponent, TrackEventComponent } from "./eventsComponents";
 import type { PlaylistSource } from "./main";
 import type { Color } from "./misc";
 import type { Playlist, RoomOptions } from "./state";
@@ -29,6 +29,7 @@ export type RoundClosedEvent = {
 export type RoundEndedEvent = {
     results: ResultsEventComponent,
     nextRoundStartsIn: number,
+    wasPlayed: TrackEventComponent,
 }
 
 export type RoomSyncEvent = {
@@ -37,8 +38,10 @@ export type RoomSyncEvent = {
     leader: string,
     players: PlayerEventComponent[],
     status: RoomStatus,
-    playlist?: Playlist
-    currentRound?: RoundEventComponent
+    history: TrackEventComponent[],
+    playlist?: Playlist,
+    currentRound?: RoundEventComponent,
+    nextRoundStartsIn?: number,
 }
 
 export type PlayerJoinedEvent = {

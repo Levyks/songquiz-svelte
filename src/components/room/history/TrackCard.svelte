@@ -1,21 +1,26 @@
 <script lang="ts">
     import Card, { PrimaryAction } from '@smui/card';
 
-    export let song: {
-        image: string;
-        name: string;
-        artist: string;
-    }
+    import type { Track } from '@/typings/main';
+
+    export let track: Track;
 
 </script>
 
 <Card class="m-2" variant="outlined">
     <PrimaryAction>
-        <a href="/alouu" target="_blank" style="color: inherit;">
+        <a href={track.url} target="_blank" style="color: inherit;">
             <div class="content">
-                <img src={song.image} class="cover" alt="Song's cover"/>
-                <span class="name">{song.name}</span>
-                <span class="artist">{song.artist}</span>
+                <img src={track.cover} class="cover" alt="Song's cover"/>
+                <span class="name">{track.name}</span>
+                <span class="artist">
+                    {#each track.artists as artist, idx}
+                        <a target="_blank" href={artist.url}>{artist.name}</a>
+                        {#if idx < track.artists.length - 1}
+                            <span>, </span>
+                        {/if}
+                    {/each}
+                </span>
             </div>
         </a>
     </PrimaryAction>

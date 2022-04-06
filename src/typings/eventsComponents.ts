@@ -31,3 +31,15 @@ export type PlayerEventComponent = {
     connected: boolean,
     score: number,
 }
+
+export type ArtistEventComponent = {
+    name: string,
+    url: string,
+}
+
+export type TrackEventComponent = {
+    name: string,
+    artists: ArtistEventComponent[],
+    cover: string,
+    url: string,
+}

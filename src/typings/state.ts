@@ -1,4 +1,5 @@
 import type { RoomStatus, RoomGuessMode, PlaylistType, RoundType } from "@/enums";
+import type { Track } from "./main";
 import type { Color } from "./misc";
 
 export type Room = {
@@ -7,6 +8,7 @@ export type Room = {
     leader: string,
     players: PlayersIndexed,
     status: RoomStatus,
+    history: Track[],
     playlist?: Playlist,
     currentRound?: Round,
     nextRoundStartsIn?: number,

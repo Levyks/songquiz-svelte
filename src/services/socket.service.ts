@@ -9,6 +9,8 @@ import type { GameStartingEvent, OptionsUpdatedEvent, PlayerJoinedEvent, RoomSyn
 import type { Guesses, Player, PlayersIndexed, Playlist, Results, RoomOptions } from "@/typings/state";
 import type { GuessEventComponent, ResultsEventComponent } from "@/typings/eventsComponents";
 
+const HISTORY_SIZE = 10;
+
 export let socket: Socket;
 
 export function connect(roomCode: string, nickname: string, token: string): Promise<void> {
@@ -169,6 +171,8 @@ function handleRoundEnded(data: RoundEndedEvent) {
         data.results.forEach(({nickname, score}) => {
             r.players[nickname].score += score;
         });
+
+        r.history = [data.wasPlayed].concat(r.history.slice(0, HISTORY_SIZE - 1));
 
         return r;
     });

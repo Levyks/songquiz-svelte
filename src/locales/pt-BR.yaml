@@ -24,5 +24,8 @@ round:
     noOneCorrect: Ninguém acertou, a música era {song} por {artist}
     nextRoundIn: Próxima rodada em {time} segundos
     finalResultsIn: Resultados finais em {time} segundos
+history:
+  title: Você acabou de ouvir
+  empty: Você ainda não ouviu nada
 misc:
   loading: Carregando
