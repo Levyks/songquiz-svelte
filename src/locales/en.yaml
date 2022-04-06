@@ -19,5 +19,10 @@ round:
   interactionNeeded: Interaction needed
   interactionNeededDesc: We can't play the song without user interaction
   interactionBtnLabel: Click to play
+  results:
+    title: Results
+    noOneCorrect: No one guessed correctly, the song was {song} by {artist}
+    nextRoundIn: Next round starts in {time} seconds
+    finalResultsIn: Final results in {time} seconds
 misc:
   loading: Loading

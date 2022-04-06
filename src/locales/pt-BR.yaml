@@ -19,5 +19,10 @@ round:
   interactionNeeded: Interação necessária
   interactionNeededDesc: Não podemos tocar a música sem interação do usuário
   interactionBtnLabel: Clique para tocar
+  results:
+    title: Resultados
+    noOneCorrect: Ninguém acertou, a música era {song} por {artist}
+    nextRoundIn: Próxima rodada em {time} segundos
+    finalResultsIn: Resultados finais em {time} segundos
 misc:
   loading: Carregando
