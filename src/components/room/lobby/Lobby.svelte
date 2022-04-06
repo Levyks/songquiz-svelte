@@ -1,43 +1,88 @@
 <script lang="ts">
+
     import Card from '@smui/card';
     import Button from '@smui/button';
+    import CircularProgress from '@smui/circular-progress';
+    import IconButton from '@smui/icon-button';
+    import Snackbar, {
+        Label,
+        Actions,
+        SnackbarComponentDev 
+    } from '@smui/snackbar';  
 
     import InviteSection from './InviteSection.svelte';
     import PlaylistSection from './PlaylistSection.svelte';
     import SettingsSection from './SettingsSection.svelte';
-    import { room } from '@/stores';
+    import ErrorLabel from '@/components/misc/ErrorLabel.svelte';
 
-    let playlistSet: boolean;
+    import { room, isSelfLeader, isUpdatingOptions } from '@/stores';
+    import { SongQuizError } from "@/misc/errors";
+    import { socket } from '@/services/socket.service';
+
     let showPlaylistError: boolean = false;
+    let snackbar: SnackbarComponentDev;
+    let error: SongQuizError;
+
+    let loadingStart: boolean = false;
 
     function start() {
 
-        if(!playlistSet) {
+        if(!$room.playlist) {
             showPlaylistError = true;
+            error = new SongQuizError('playlist.notSet');
+            snackbar.open();
             return;
         }
+
+        loadingStart = true;
+
+        socket.emit('game:start', (err?: SongQuizError) => {
+            console.log({err});
+            loadingStart = false;
+            if(err) {
+                error = err;
+                snackbar.open();
+            }
+        });
 
     }
 
 </script>
 
-<Card variant="outlined" class="h-100 p-3 overflow-hidden d-flex flex-column justify-content-between">
+<Card variant="outlined" class="h-100 p-3 pt-0 overflow-hidden d-flex flex-column justify-content-between">
 
     <h4 class="text-center m-4">Lobby <strong>{$room.code}</strong></h4>
 
     <div class="sections mb-2">
-        <PlaylistSection bind:showPlaylistError bind:playlistSet />
-        <SettingsSection />
+        <PlaylistSection bind:showPlaylistError />
+        <SettingsSection/>
         <InviteSection />
     </div>
 
     <div class="start-btn-wrapper">
-        <Button variant="raised" class="w-100" on:click={start}>
+        <Button 
+            variant="raised" 
+            class="w-100" 
+            on:click={start}
+            disabled={$isUpdatingOptions || loadingStart}
+        >
+            {#if $isUpdatingOptions || loadingStart}
+                <CircularProgress indeterminate class="me-2" style="height: 24px; width: 24px;"/>
+            {/if}
             <span class="start-btn-label">Start Game</span>
         </Button>
     </div>
 
 </Card>
+
+<Snackbar 
+    bind:this={snackbar}
+>
+    <Label><ErrorLabel {error}/></Label>
+    <Actions>
+      <IconButton class="material-icons" title="Dismiss">close</IconButton>
+    </Actions>
+</Snackbar>
 
 <style lang="scss">
     .sections {

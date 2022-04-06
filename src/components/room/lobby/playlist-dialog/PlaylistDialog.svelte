@@ -20,7 +20,10 @@
 
 </script>
 
-<Dialog bind:open>
+<Dialog 
+  bind:open
+  surface$style="width: 720px; max-width: calc(100vw - 32px);"
+>
   <Title>Manage Playlist</Title>
   <Content>
 

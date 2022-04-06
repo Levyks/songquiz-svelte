@@ -1,6 +1,6 @@
 <script lang="ts">
     import { getTextColor, getHtmlColor } from '@/helpers';
-    import type { Player } from '@/typings/room';
+    import type { Player } from '@/typings/main';
 
     export let player: Player
 

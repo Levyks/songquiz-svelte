@@ -12,6 +12,8 @@
     "smui-theme-dark": "smui-theme compile public/build/smui-dark.css -i src/theme/dark"
   },
   "devDependencies": {
+    "@originjs/vite-plugin-content": "^1.0.1",
+    "@rollup/plugin-yaml": "^3.1.0",
     "@smui-extra/accordion": "^6.0.0-beta.13",
     "@smui/button": "^6.0.0-beta.13",
     "@smui/card": "^6.0.0-beta.13",
@@ -38,13 +40,15 @@
     "axios": "^0.26.0",
     "sass": "^1.49.7",
     "smui-theme": "^6.0.0-beta.13",
+    "socket.io-client": "^4.4.1",
     "svelte": "^3.44.0",
     "svelte-check": "^2.2.7",
+    "svelte-i18n": "^3.3.13",
     "svelte-preprocess": "^4.9.8",
     "svelte-routing": "^1.6.0",
-    "tepkijs-client": "^0.0.3",
     "tslib": "^2.3.1",
     "typescript": "^4.4.4",
-    "vite": "^2.7.2"
+    "vite": "^2.7.2",
+    "vite-plugin-yaml": "^1.0.5"
   }
 }

@@ -2,26 +2,31 @@
 
     import { navigate } from 'svelte-routing';
 
+    import LoadingDialog from '@/components/misc/LoadingDialog.svelte';
     import DarkModeSwitch from '@/components/misc/DarkModeSwitch.svelte';
     import History from '@/components/room/history/History.svelte';
     import Players from '@/components/room/players/Players.svelte';
+
+    import { RoomStatus } from '@/enums';
     
     import Lobby from '@/components/room/lobby';
     import Starting from '@/components/room/Starting.svelte';
     import Round from '@/components/room/round';
 
-    import { room } from '@/stores';
+    import { _ } from 'svelte-i18n';
+
+    import { room, connected } from '@/stores';
     import { connect } from '@/services/room.service';
 
     export let code: string;
 
     const components = {
-        'lobby': Lobby,
-        'starting': Starting,
-        'round': Round,
+        [RoomStatus.Lobby]: Lobby,
+        [RoomStatus.Starting]: Starting,
+        [RoomStatus.Playing]: Round,
     }
 
-    if(!$room.isConnected) {
+    if(!$room && !$connected) {
         connect(code).catch(() => navigate(`/?join=${code}`));
     }
 
@@ -32,7 +37,7 @@
 </div>
 
 <div class="grid">
-    {#if $room.isConnected}
+    {#if $connected && $room}
         <div class="cell history">
             <History />
         </div>
@@ -42,8 +47,10 @@
         <div class="cell players">
             <Players />
         </div>
+    {:else if !$room}
+        <LoadingDialog open={true} text={$_('room.connecting')} />
     {:else}
-        sem conexão
+        <LoadingDialog open={true} text={$_('room.connectionLost')} />
     {/if}
 </div>
 

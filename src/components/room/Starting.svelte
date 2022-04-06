@@ -4,23 +4,23 @@
     import CircularProgress from '@smui/circular-progress';
     import Card from '@smui/card';
 
+    import { room } from '@/stores';
     import { playAudio } from '@/helpers';  
 
-    const countdownTotal = 3000;
-    const countdownStep = 100;
+    const step = 100;
+    const totalTime = $room.nextRoundStartsIn! * (1000 / step);
+
+    let remainingTime = totalTime;
 
     let loading = false;
-    let countdown = countdownTotal;
-    let interval = setInterval(decreaseCountdown, countdownStep);
-
-    function decreaseCountdown() {
-        countdown -= countdownStep;
-        if (countdown <= 0) {
+    let interval = setInterval(() => {
+        if(remainingTime > 0) {
+            remainingTime -= 1;
+        } else {
             clearInterval(interval);
-            interval = null;
             loading = true;
         }
-    }
+    }, step);
 
     const audio = playAudio('/assets/audio/countdown.mp3', 0.5);
 
@@ -37,8 +37,8 @@
         <CircularProgress 
             style="height: 64px; width: 64px;" 
             indeterminate={loading}
-            progress={(countdownTotal - countdown) / countdownTotal}
+            progress={(totalTime - remainingTime) / totalTime}
         />
-        <h3 class="text-center m-4">{Math.ceil(countdown/1000) || 'Starting'}</h3>
+        <h3 class="text-center m-4">{Math.ceil(remainingTime/(1000 / step)) || 'Starting'}</h3>
     </div>
 </Card>

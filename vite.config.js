@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
+import yaml from '@rollup/plugin-yaml';
 import path from 'path';
 
 // https://vitejs.dev/config/
@@ -9,9 +10,12 @@ export default defineConfig({
       '@': path.resolve('./src'),
     }
   },
-  plugins: [svelte({
-    compilerOptions: {
-      dev: true
-    }
-  })]
+  plugins: [
+    svelte({
+      compilerOptions: {
+        dev: true
+      }
+    }),
+    yaml()
+  ]
 })

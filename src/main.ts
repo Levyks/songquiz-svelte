@@ -1,6 +1,8 @@
+import "./i18n";
+import "./stores";
+
 import App from './App.svelte'
 
-import "./stores";
 import axios from "axios";
 
 const app = new App({

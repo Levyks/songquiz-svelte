@@ -1,15 +1,26 @@
 <script lang="ts">
-    import Textfield from '@smui/textfield';
+    
+    import Textfield, { TextfieldComponentDev } from '@smui/textfield';
     import TextfieldIcon from '@smui/textfield/icon';
     import HelperText from '@smui/textfield/helper-text';
     import Fab from '@smui/fab';
     import CircularProgress from '@smui/circular-progress';
+    import IconButton from '@smui/icon-button';
     import { Icon } from '@smui/common';
-    import { room } from '@/stores';
 
-    let url: string = '';
+    import Snackbar, {
+        Actions,
+        Label,
+        SnackbarComponentDev 
+    } from '@smui/snackbar';  
+     
+    import { _ } from 'svelte-i18n';
 
-    let buttonStatus: 'idle' | 'loading' | 'success' | 'error' = 'idle';
+    import { getPlaylistSourceFromUrl } from '@/services/playlist.service';
+    import { socket } from '@/services/socket.service';
+
+    import type { SongQuizError } from '@/misc/errors';
+    import type { PlaylistSource } from '@/typings/main';
 
     const classes = {
         success: 'bg-success',
@@ -22,6 +33,29 @@
         success: 'done',
     }
 
+    let snackbar: SnackbarComponentDev; 
+    let textfield: TextfieldComponentDev;
+
+    let buttonStatus: 'idle' | 'loading' | 'success' | 'error' = 'idle';
+
+    let url: string = '';
+    let lastUrlSubmitted: string = '';
+    let messageCode: string = '';
+    let messageParams: { [key: string]: string } | undefined;
+
+    let playlistSource: PlaylistSource | null;
+    let buttonDisabled: boolean = false;
+
+    $: playlistSource = getPlaylistSourceFromUrl(url);
+    $: buttonDisabled = buttonStatus !== 'idle' || lastUrlSubmitted === url
+
+    $: {
+        if(textfield && url) {
+            const input = textfield.getElement().querySelector('input');
+            input?.setCustomValidity(playlistSource ? '' : 'Invalid playlist url');
+        }
+    }
+
     function setResultStatus(status: 'success' | 'error') {
         buttonStatus = status;
         setTimeout(() => {
@@ -31,12 +65,17 @@
 
     function handleSubmit() {
         buttonStatus = 'loading';
-        room.call('setPlaylist', 'spotify', url).then(() => {
-            setResultStatus('success');
-            console.log($room);
-        }).catch((er) => {
-            console.error(er);
-            setResultStatus('error');
+        socket.emit('playlist:set', playlistSource!, (err: SongQuizError) => {
+            if(err) {
+                lastUrlSubmitted = '';
+                setResultStatus('error');
+                messageCode = err.messageCode
+                messageParams = err.params;
+                snackbar.open();
+            } else {
+                lastUrlSubmitted = url;
+                setResultStatus('success');
+            }
         });
     }
 
@@ -45,18 +84,18 @@
 <form on:submit|preventDefault={handleSubmit}>
     <div class="d-flex align-items-center mt-2">
         <div class="flex-1 me-3">
-            <Textfield bind:value={url} label="URL" style="width: 100%;" required>
+            <Textfield bind:this={textfield} bind:value={url} label="URL" style="width: 100%;" required>
                 <TextfieldIcon class="material-icons" slot="leadingIcon">link</TextfieldIcon>
                 <HelperText slot="helper">Platforms supported: Spotify</HelperText>
             </Textfield>
         </div>
         <Fab
-            class="transition-bg {classes[buttonStatus]}"
+            class="transition-bg {classes[buttonStatus]} {buttonDisabled && buttonStatus === 'idle' ? 'bg-disabled' : ''}"
             color="primary"
             mini
-            disabled={buttonStatus !== 'idle'}
+            disabled={buttonDisabled}
             style={`
-                ${buttonStatus !== 'idle' ? 'cursor: default;' : ''}
+                ${buttonDisabled ? 'cursor: default;' : ''}
             `}
         >
             <Icon class="material-icons">
@@ -69,3 +108,12 @@
         </Fab>
     </div>
 </form>
+
+<Snackbar bind:this={snackbar}>
+    {#if messageCode}
+        <Label>{$_(messageCode, { values: messageParams })}</Label>
+    {/if}
+    <Actions>
+      <IconButton class="material-icons" title="Dismiss">close</IconButton>
+    </Actions>
+</Snackbar>

@@ -1,7 +1,7 @@
-import type { RoomState } from "@/typings/room";
-import { writable } from "svelte/store";
-import { createStore } from "tepkijs-client";  
-import { get_store_value } from 'svelte/internal'
+import { get_store_value } from "svelte/internal";
+import { writable, derived } from "svelte/store";
+
+import type { Room } from "@/typings/state";
 
 export const width = writable(window.innerWidth);
 
@@ -24,30 +24,20 @@ darkMode.subscribe(dm => {
     const light = document.getElementById('light-css');
 
     if (dm) {
-        dark.setAttribute("media", "all");
-        light.setAttribute("media", "none");
+        dark?.setAttribute("media", "all");
+        light?.setAttribute("media", "none");
     } else {
-        dark.setAttribute("media", "none");
-        light.setAttribute("media", "all");
+        dark?.setAttribute("media", "none");
+        light?.setAttribute("media", "all");
     }
 });
 
-export const room = {
-    ...createStore<RoomState>()
-};
+export const room = writable<Room>();
 
+room.subscribe((r) => console.log(r));
+
+export const isSelfLeader = derived(room, r => r.players[r.leader].isSelf);
+export const isUpdatingOptions = writable(false);
 export const player = writable<string>();
 
-room.subscribe((value) => {
-    console.log('room', value);
-})
-
-export const isLeader = writable(false);
-
-player.subscribe(nickname => {
-    isLeader.set(nickname === get_store_value(room).leader);
-});
-
-room.subscribe(room => {
-    isLeader.set(room.leader === get_store_value(player));
-});
+export const connected = writable(false);

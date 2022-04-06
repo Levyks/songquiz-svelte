@@ -30,6 +30,8 @@
             })
             .catch((err: AxiosError) => {
 
+                console.error(err);
+
                 let message = 'Unknown error';
 
                 if(err.isAxiosError) {

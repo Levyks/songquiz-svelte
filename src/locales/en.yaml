@@ -1,0 +1,23 @@
+errors:
+  unknown: Unknown error
+  onlyLeader: Only the leader can do this
+  playlist:
+    unknownSource: 'Unknown playlist source: "{source}"'
+playlist:
+  notSet: Playlist not set
+  logoAlt: '{platform} logo'
+  coverAlt: Playlist cover image
+  byCreator: By {creator}
+room:
+  connecting: Connecting to the room
+  connectionLost: Connection lost, trying to reconnect
+round:
+  numberLabel: Round {number}
+  typeLabels:
+    song: Guess the song
+    artist: Guess the artist(s)
+  interactionNeeded: Interaction needed
+  interactionNeededDesc: We can't play the song without user interaction
+  interactionBtnLabel: Click to play
+misc:
+  loading: Loading

@@ -1,48 +1,92 @@
 <script lang="ts">
+
     import Slider from '@smui/slider';  
     import Radio from '@smui/radio';
     import FormField from '@smui/form-field';
     import Switch from '@smui/switch';
+    import Snackbar, {
+        Actions,
+        Label,
+        SnackbarComponentDev 
+    } from '@smui/snackbar';  
+    import IconButton from '@smui/icon-button';
 
-    let rounds: number = 10;
-    let timePerRound: number = 15;
+    import ErrorLabel from '@/components/misc/ErrorLabel.svelte';
+    
+    import { _ } from 'svelte-i18n';
 
-    let selected: string = 'Song';
+    import { room, isUpdatingOptions, isSelfLeader } from '@/stores';
+    import { socket } from '@/services/socket.service';
+
+    import { RoomGuessMode } from '@/enums';
+    import type { SongQuizError } from '@/misc/errors';
+
+    let errorSnackbar: SnackbarComponentDev;
+    let error: SongQuizError;
+
+    const guessModeLabels: { [key: string]: string } = {
+        [RoomGuessMode.Song]: 'Song',
+        [RoomGuessMode.Artist]: 'Artist(s)',
+        [RoomGuessMode.Both]: 'Both (Random)',
+    };
+
+    function handleChange() {
+        
+        $isUpdatingOptions = true;
+        
+        socket.emit('options:set', $room.options, (err?: SongQuizError) => {
+            
+            $isUpdatingOptions = false;
+            
+            if(err) {
+                error = err;
+                errorSnackbar.open();
+            }
+
+        });
+    }
+
 </script>
 
 <div class="d-flex align-items-center">
-    <span>Rounds: <strong>{rounds}</strong></span>
+    <span>Rounds: <strong>{$room.options.numberOfRounds}</strong></span>
     <Slider
         class="flex-1"
         min={5}
         max={20}
         discrete
-        bind:value={rounds}
+        disabled={!$isSelfLeader || $isUpdatingOptions}
+        bind:value={$room.options.numberOfRounds}
+        on:SMUISlider:change={handleChange}
     />
 </div>
 
 <div class="d-flex align-items-center">
-    <span><strong>{timePerRound}</strong> seconds per round</span>
+    <span><strong>{$room.options.secondsPerRound}</strong> seconds per round</span>
     <Slider
         class="flex-1"
         min={5}
         max={30}
         discrete
-        bind:value={timePerRound}
+        disabled={!$isSelfLeader || $isUpdatingOptions}
+        bind:value={$room.options.secondsPerRound}
+        on:SMUISlider:change={handleChange}
     />
 </div>
 
 <div class="d-flex align-items-center">
     <span>You'll be guessing:</span>
     <div class="d-flex flex-wrap">
-        {#each ['Song', 'Artist(s)', 'Both (Random)'] as option}
+        {#each Object.entries(guessModeLabels) as [key, label]}
             <FormField>
                 <Radio
-                    bind:group={selected}
-                    value={option}
+                    value={key}
+                    disabled={!$isSelfLeader || $isUpdatingOptions}
+                    bind:group={$room.options.guessMode}
+                    on:change={handleChange}
                 />
                 <span slot="label">
-                    {option}
+                    {label}
                 </span>
             </FormField>
         {/each}
@@ -50,9 +94,20 @@
 </div>
 
 <FormField>
-    <Switch />
+    <Switch     
+        disabled={!$isSelfLeader || $isUpdatingOptions}    
+        bind:checked={$room.options.showGuessesPreview} 
+        on:SMUISwitch:change={handleChange}
+    />
     <span slot="label">Show guesses preview.</span>
 </FormField>
+
+<Snackbar bind:this={errorSnackbar}>
+    <Label><ErrorLabel {error}/></Label>
+    <Actions>
+      <IconButton class="material-icons" title="Dismiss">close</IconButton>
+    </Actions>
+</Snackbar>
 
 <style lang="scss">
 </style>

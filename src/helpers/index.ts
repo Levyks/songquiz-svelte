@@ -1,4 +1,4 @@
-import type { Color } from "@/typings/room";
+import type { Color } from "@/typings/main";
 
 export function delay(ms: number): Promise<void> {
     return new Promise(resolve => {

@@ -1,0 +1,23 @@
+errors:
+  unknown: Erro desconhecido
+  onlyLeader: Somente o líder pode fazer isso
+  playlist:
+    unknownSource: 'Fonte de playlist desconhecida: "{source}"'
+playlist:
+  notSet: Playlist não definida
+  logoAlt: Logo do(a) {platform}
+  coverAlt: Imagem de capa da playlist
+  byCreator: Por {creator}
+room:
+  connecting: Conectando-se a sala
+  connectionLost: A conexão foi perdida, tentando reconectar
+round:
+  numberLabel: Rodada {number}
+  typeLabels:
+    song: Adivinhe a música
+    artist: Adivinhe o(s) artista(s)
+  interactionNeeded: Interação necessária
+  interactionNeededDesc: Não podemos tocar a música sem interação do usuário
+  interactionBtnLabel: Clique para tocar
+misc:
+  loading: Carregando

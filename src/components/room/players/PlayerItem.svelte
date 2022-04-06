@@ -2,14 +2,18 @@
     import { Icon } from '@smui/common';
 
     import PlayerIcon from '@/components/misc/PlayerIcon.svelte';
-    import type { Player } from '@/typings/room';
-    import { room, isLeader as isPlayerLeader } from '@/stores';
+    import type { Player } from '@/typings/main';
+    import { room, player as selfPlayer } from '@/stores';
     import PlayerLeaderMenu from './PlayerLeaderMenu.svelte';
 
     export let player: Player;
 
     let isLeader: boolean;
     $: isLeader = player.nickname === $room.leader
+
+    let isSelfLeader: boolean;
+    $: isSelfLeader = $selfPlayer === $room.leader
+
 
 </script>
 
@@ -23,11 +27,15 @@
         <Icon class="material-icons ms-1">security</Icon>
     {/if}
 
+    {#if !player.connected}
+        <Icon class="material-icons ms-1" style="color: #eed202;">signal_wifi_statusbar_connected_no_internet_4</Icon>
+    {/if}
+
     <span class="ms-auto" title="Score">
         {player.score} pt.
     </span>
 
-    {#if $isPlayerLeader}
+    {#if isSelfLeader}
         <PlayerLeaderMenu {player}/>
     {/if}
 

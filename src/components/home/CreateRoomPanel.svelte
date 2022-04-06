@@ -10,7 +10,6 @@
     import AlertDialog from '@/components/misc/AlertDialog.svelte';
 
     import { create } from '@/services/room.service';
-    import { room } from '@/stores';
 
     export let username: string;
     let loading: boolean = false;
@@ -23,8 +22,8 @@
         loading = true;
 
         create(username)
-            .then(() => {
-                navigate(`/room/${$room.code}`);
+            .then((code) => {
+                navigate(`/room/${code}`);
             })
             .catch((err: AxiosError) => {
 
