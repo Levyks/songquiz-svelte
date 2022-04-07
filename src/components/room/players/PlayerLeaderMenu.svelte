@@ -1,9 +1,11 @@
 <script lang="ts">
+    import { _ } from 'svelte-i18n';
+
     import List, { Item, Text } from '@smui/list';
     import Menu from '@smui/menu';
     import IconButton from '@smui/icon-button';   
     
-    import type { Player } from '@/typings/room';
+    import type { Player } from '@/typings/state';
 
     export let player: Player;
     
@@ -39,10 +41,10 @@
     >
         <List>
             <Item on:SMUI:action={() => {}}>
-                <Text>Kick</Text>
+                <Text>{ $_('players.kick') }</Text>
             </Item>
             <Item on:SMUI:action={() => {}}>
-                <Text>Make leader</Text>
+                <Text>{ $_('players.makeLeader') }</Text>
             </Item>
         </List>
     </Menu>

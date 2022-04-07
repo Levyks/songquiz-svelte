@@ -1,21 +1,60 @@
 errors:
-  unknown: Unknown error
   onlyLeader: Only the leader can do this
   playlist:
     unknownSource: 'Unknown playlist source: "{source}"'
+home:
+  create:
+    title: Create a room
+    btn: Create
+  join:
+    title: Join a room
+    btn: Join
+  usernameLabel: Your username
+  usernameHelper: The name that the other players will see
+  codeLabel: Room code
+  aboutMe: About me
 playlist:
   notSet: Playlist not set
+  notSetShort: Not set
   logoAlt: '{platform} logo'
   coverAlt: Playlist cover image
   byCreator: By {creator}
+  dialog:
+    title: Manage Playlist
+    tabs:
+      url: URL
+      loginWithSpotify: Login with Spotify
+    info:
+      name: Name
+      platform: Plataform
+      numberOfPlayable: "N° of playable songs:"
+      numberOfRemaining: "N° of songs not played:"
+    url:
+      invalid: Invalid playlist URL
+      supportedPlatforms: "Supported platforms: {platforms}"
 room:
   connecting: Connecting to the room
   connectionLost: Connection lost, trying to reconnect
+  starting: The game is about to start
+lobby:
+  title: Room {code}
+  inviteCopied: The invite URL has been copied to your clipboard
+  startGame: Start game
+  settings:
+    numberOfRounds: "Rounds: <b>{number}</b>"
+    secondsPerRound: "<b>{seconds}</b> seconds per round"
+    guessModeLabel: "You'll be guessing:"
+    guessModes:
+      song: Song
+      artist: Artist(s)
+      both: Both (Random)
+    showGuessesPreview: Show guesses preview.
 round:
   numberLabel: Round {number}
   typeLabels:
     song: Guess the song
     artist: Guess the artist(s)
+  remainingLabel: "{time} seconds remaining"
   interactionNeeded: Interaction needed
   interactionNeededDesc: We can't play the song without user interaction
   interactionBtnLabel: Click to play
@@ -27,5 +66,14 @@ round:
 history:
   title: You've listened to
   empty: You haven't listened to anything yet
+players:
+  title: Players
+  kick: Kick
+  ban: Ban (IP)
+  makeLeader: Make leader
 misc:
   loading: Loading
+  volume: Volume
+  close: Close
+  unknownError: Unknown error
+  comingSoon: Coming soon

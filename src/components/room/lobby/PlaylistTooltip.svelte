@@ -6,7 +6,7 @@
 
     import { _ } from 'svelte-i18n';
 
-    import type { Playlist } from '@/typings/main';
+    import type { Playlist } from '@/typings/state';
 
     export let playlist: Playlist;
 </script>

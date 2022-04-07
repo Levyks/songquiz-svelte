@@ -1,5 +1,7 @@
 <script lang="ts">
 
+  import { _ } from 'svelte-i18n';
+
   import Dialog, { Title, Content, Actions } from '@smui/dialog';
   import Button, { Label as ButtonLabel } from '@smui/button';
   import Tab, { Label as TabLabel } from '@smui/tab';
@@ -14,8 +16,8 @@
   let activeTab: string = 'URL';
 
   const tabs = {
-    'URL': UrlTab,
-    'Login With Spotify': LoginWithSpotify
+    [$_('playlist.dialog.tabs.url')]: UrlTab,
+    [$_('playlist.dialog.tabs.loginWithSpotify')]: LoginWithSpotify
   }
 
 </script>
@@ -24,13 +26,17 @@
   bind:open
   surface$style="width: 720px; max-width: calc(100vw - 32px);"
 >
-  <Title>Manage Playlist</Title>
+  <Title>{ $_('playlist.dialog.title') }</Title>
   <Content>
 
     <PlaylistInfo/>
 
     <TabBar tabs={Object.keys(tabs)} let:tab bind:active={activeTab}>
-      <Tab {tab}>
+      <Tab 
+        {tab}
+        disabled={tab === $_('playlist.dialog.tabs.loginWithSpotify')}
+        title={tab === $_('playlist.dialog.tabs.loginWithSpotify') ? $_('misc.comingSoon') : undefined}
+      >
         <TabLabel>{tab}</TabLabel>
       </Tab>
     </TabBar>
@@ -40,7 +46,7 @@
   </Content>
   <Actions>
     <Button on:click={() => open = false}>
-      <ButtonLabel>Close</ButtonLabel>
+      <ButtonLabel>{ $_('misc.close') }</ButtonLabel>
     </Button>
   </Actions>
 </Dialog>

@@ -1,4 +1,6 @@
 <script lang="ts">
+
+    import { _ } from 'svelte-i18n';
     
     import Textfield from '@smui/textfield';
     import HelperText from '@smui/textfield/helper-text';
@@ -10,10 +12,10 @@
 <div class="mb-3">
     <Textfield 
         bind:value={username} 
-        label="Your username"   
+        label={ $_('home.usernameLabel') }
         style="width: 100%;"
         required
     >
-        <HelperText slot="helper">The name that the other players will see</HelperText>
+        <HelperText slot="helper">{ $_('home.usernameHelper') }</HelperText>
     </Textfield>
 </div>

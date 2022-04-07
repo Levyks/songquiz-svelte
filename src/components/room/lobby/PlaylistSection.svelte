@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    import { _ } from 'svelte-i18n';
+
     import Button, { Label } from '@smui/button';
 
     import { room, isSelfLeader } from '@/stores';
@@ -19,11 +21,11 @@
         {#if $room.playlist}
             <PlaylistFab /> 
         {:else}
-            <strong class="not-set me-2" class:error={showPlaylistError}>Not set</strong>
+            <strong class="not-set me-2" class:error={showPlaylistError}>{ $_('playlist.notSetShort') }</strong>
         {/if}
         {#if $isSelfLeader}
             <Button class="my-1" on:click={() => dialogOpened = true}>
-                <Label>Manage Playlist</Label>
+                <Label>{ $_('playlist.dialog.title') }</Label>
             </Button>
         {/if}
     </div>

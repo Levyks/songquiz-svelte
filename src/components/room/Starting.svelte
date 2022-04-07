@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onDestroy } from 'svelte';
+    import { _ } from 'svelte-i18n';
 
     import CircularProgress from '@smui/circular-progress';
     import Card from '@smui/card';
@@ -33,7 +34,7 @@
 
 <Card variant="outlined" class="h-100 p-3 overflow-hidden d-flex flex-column justify-content-center">
     <div class="text-center">
-        <h4 class="text-center m-4">The game is about to start</h4>
+        <h4 class="text-center m-4">{ $_('room.starting') }</h4>
         <CircularProgress 
             style="height: 64px; width: 64px;" 
             indeterminate={loading}

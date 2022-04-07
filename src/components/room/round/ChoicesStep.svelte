@@ -1,44 +1,33 @@
 <script lang="ts">
-    import { onDestroy } from 'svelte';
 
-    import Card from '@smui/card';
-    import ChoiceButton from './ChoiceButton.svelte';
-    import FormField from '@smui/form-field';
-    import Slider from '@smui/slider'; 
-
-    import InteractionDialog from './InteractionDialog.svelte';
-
+    import { onMount } from 'svelte';
     import { _ } from 'svelte-i18n';
 
+    import Card from '@smui/card';
+
+    import ChoiceButton from './ChoiceButton.svelte';
+    import InteractionDialog from './InteractionDialog.svelte';
+
+    import ErrorDialog from '@/components/misc/ErrorDialog.svelte';
+    import VolumeSlider from '@/components/misc/VolumeSlider.svelte';
+
+    import { volume } from '@/stores';
+    import { socket } from '@/services/socket.service';
     import { RoundType } from '@/enums';
 
-    import { playAudio } from '@/helpers';
-    import { socket } from '@/services/socket.service';
-    import ErrorDialog from '@/components/misc/ErrorDialog.svelte';
     import type { SongQuizError } from '@/misc/errors';
     import type { Round } from '@/typings/state';
     
     export let round: Round;
 
-    const labels = {
-        [RoundType.Song]: 'round.typeLabels.song',
-        [RoundType.Artist]: 'round.typeLabels.artist',
-    }
     let label: string;
-    $: label = $_(labels[round.type]);
+    $: label = {
+        [RoundType.Song]: $_('round.typeLabels.song'),
+        [RoundType.Artist]: $_('round.typeLabels.artist'),
+    }[round.type];
 
-    let volume: number = Number(localStorage.getItem('volume')) || 25;
-    $: {
-        if(audio) audio.volume = volume/100;
-        localStorage.setItem('volume', volume.toString());
-    }
-
+    let audio: HTMLAudioElement;
     let interactionDialogOpen: boolean = false;
-    
-    const audio = playAudio(round.audioUrl, volume/100);
-    audio.addEventListener('canplay', () => { 
-        if(audio.paused) interactionDialogOpen = true;
-    });
 
     let remainingTime = round.remainingTime;
     
@@ -51,14 +40,20 @@
         }
     }, 1000);
 
-    onDestroy(() => {
-        if(!audio.ended) audio.pause();
-        clearInterval(interval);
-    });
-
     let selectedChoice: number | undefined;
     let errorDialog: ErrorDialog;
     let error: SongQuizError;
+
+    onMount(() => {
+
+        audio.play();
+
+        return () => {
+            audio.pause();
+            clearInterval(interval);
+        }
+
+    });
 
     function handleChoiceClick(choice: number) {
         selectedChoice = choice;
@@ -77,11 +72,11 @@
 
 </script>
 
-<Card variant="outlined" class="h-100 p-3 overflow-hidden d-flex flex-column justify-content-between text-center">
+<Card variant="outlined" class="h-100 p-3 pt-0 overflow-hidden d-flex flex-column justify-content-between text-center">
     <div>
         <h4 class="mt-4 mb-1">{ $_('round.numberLabel', { values: { number: round.number}}) }</h4>
         <h5 class="my-1">{label}</h5>
-        <h6 class="my-1">{ remainingTime } seconds</h6>
+        <h6 class="my-1">{ $_('round.remainingLabel', { values: { time: remainingTime }}) }</h6>
     </div>
     <div class="choices-wrapper">
         {#each round.choices as choice, idx}
@@ -95,13 +90,14 @@
             />
         {/each}
     </div>
-    <div>
-        <FormField align="end" style="display: flex;">
-            <strong slot="label" style="font-size: 1.25rem;" class="me-1">Volume</strong>
-            <Slider style="flex-grow: 1;" bind:value={volume} min={0} max={100} step={1} discrete/>
-        </FormField>
-    </div>
+    <VolumeSlider/>
 </Card>
+
+<audio 
+    bind:this={audio}
+    volume={$volume}
+    src={round.audioUrl}
+/>
 
 <InteractionDialog bind:open={interactionDialogOpen} on:interaction={() => audio.play()}/>
 <ErrorDialog bind:this={errorDialog} {error}/>

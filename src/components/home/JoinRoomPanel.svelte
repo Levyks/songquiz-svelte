@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    import { _ } from 'svelte-i18n';
+
     import { navigate } from 'svelte-routing';
     import type { AxiosError } from 'axios';
 
@@ -56,7 +58,7 @@
 <form on:submit|preventDefault={handleJoin}>
     <UsernameField bind:username/>
     <Textfield
-        label="Room code"
+        label={ $_('home.codeLabel') }
         style="width: 100%;"
         class="mb-3"
         bind:value={roomCode}
@@ -64,7 +66,7 @@
     ></Textfield>
     <div class="flex-center">
         <Button variant="raised" type="submit">
-            <Label>Join</Label>
+            <Label>{ $_('home.join.btn') }</Label>
         </Button>
     </div>
 </form>

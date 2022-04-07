@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { _ } from 'svelte-i18n';
 
     import Textfield from '@smui/textfield';
     import IconButton from '@smui/icon-button';
@@ -21,7 +22,7 @@
     let input: HTMLInputElement;
 
     onMount(() => {
-        input = textfield.getElement().querySelector('input');
+        input = textfield.getElement().querySelector('input')!;
 
         input.setAttribute('readonly', 'readonly');
     });
@@ -53,7 +54,7 @@
 </div>
 
 <Snackbar bind:this={snackbar}>
-    <Label>The invite URL was copied</Label>
+    <Label>{$_('lobby.inviteCopied')}</Label>
     <Actions>
       <IconButton class="material-icons" title="Dismiss">close</IconButton>
     </Actions>

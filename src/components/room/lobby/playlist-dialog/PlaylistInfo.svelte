@@ -13,10 +13,10 @@
     <div class="wrapper">
         {#key $room.playlist.url}
             <div class="grid my-2" in:fade={{duration: 500, delay: 500}} out:fade={{duration: 500}}>
-                <span><strong>Name:</strong> {$room.playlist.name}</span>
-                <span><strong>Platform:</strong> {platforms[$room.playlist.type] || $room.playlist.type}</span>
-                <span><strong>N° of playable songs:</strong> {$room.playlist.playable_tracks_count}</span>
-                <span><strong>N° of songs not played:</strong> {$room.playlist.remaining_playable_tracks_count}</span>
+                <span><strong>{$_('playlist.dialog.info.name')}:</strong> {$room.playlist.name}</span>
+                <span><strong>{$_('playlist.dialog.info.platform')}:</strong> {platforms[$room.playlist.type] || $room.playlist.type}</span>
+                <span><strong>{$_('playlist.dialog.info.numberOfPlayable')}:</strong> {$room.playlist.playable_tracks_count}</span>
+                <span><strong>{$_('playlist.dialog.info.numberOfRemaining')}:</strong> {$room.playlist.remaining_playable_tracks_count}</span>
                 <div class="img-wrapper">
                     <img src={$room.playlist.cover} alt="playlist cover"/>
                 </div>

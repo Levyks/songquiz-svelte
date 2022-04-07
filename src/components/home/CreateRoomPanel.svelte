@@ -1,4 +1,6 @@
 <script lang="ts">
+    
+    import { _ } from 'svelte-i18n';
 
     import { navigate } from 'svelte-routing';
     import type { AxiosError } from 'axios';
@@ -52,7 +54,7 @@
     <UsernameField bind:username/>
     <div class="flex-center">
         <Button variant="raised">
-            <Label>Create</Label>
+            <Label>{ $_('home.create.btn') }</Label>
         </Button>
     </div>
 </form>

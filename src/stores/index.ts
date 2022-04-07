@@ -3,19 +3,24 @@ import { writable, derived } from "svelte/store";
 
 import type { Room } from "@/typings/state";
 
-export const width = writable(window.innerWidth);
-
-window.addEventListener("resize", () => {
-    width.set(window.innerWidth);
-});
-
-// Theme
-
 const defaultDarkMode = 
     localStorage.getItem("dark-mode") === '1' ??
     window.matchMedia("(prefers-color-scheme: dark)").matches;
 
+const defaultVolume = parseInt(localStorage.getItem("volume") ?? '50');
+
+export const width = writable(window.innerWidth);
 export const darkMode = writable(defaultDarkMode);
+export const room = writable<Room>();
+export const isSelfLeader = derived(room, r => r.players[r.leader].isSelf);
+export const isUpdatingOptions = writable(false);
+export const player = writable<string>();
+export const connected = writable(false);
+export const volume = writable<number>(defaultVolume);
+
+window.addEventListener("resize", () => {
+    width.set(window.innerWidth);
+});
 
 darkMode.subscribe(dm => {
     localStorage.setItem("dark-mode", dm ? '1' : '0');
@@ -32,12 +37,6 @@ darkMode.subscribe(dm => {
     }
 });
 
-export const room = writable<Room>();
-
-room.subscribe((r) => console.log(r));
-
-export const isSelfLeader = derived(room, r => r.players[r.leader].isSelf);
-export const isUpdatingOptions = writable(false);
-export const player = writable<string>();
-
-export const connected = writable(false);
+volume.subscribe(v => {
+    localStorage.setItem("volume", v.toString());
+});

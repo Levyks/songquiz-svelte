@@ -1,4 +1,7 @@
 <script lang="ts">
+    
+    import { _ } from 'svelte-i18n';
+
     import Dialog, { Title, Content, Actions } from '@smui/dialog';
     import Button, { Label } from '@smui/button';
 
@@ -12,7 +15,7 @@
     <Content>{content}</Content>
     <Actions>
         <Button on:click={() => open = false}>
-            <Label>Close</Label>
+            <Label>{ $_('misc.close') }</Label>
         </Button>
     </Actions>
 </Dialog>

@@ -9,7 +9,7 @@ import type { GameStartingEvent, OptionsUpdatedEvent, PlayerJoinedEvent, RoomSyn
 import type { Guesses, Player, PlayersIndexed, Playlist, Results, RoomOptions } from "@/typings/state";
 import type { GuessEventComponent, ResultsEventComponent } from "@/typings/eventsComponents";
 
-const HISTORY_SIZE = 10;
+const HISTORY_SIZE = 5;
 
 export let socket: Socket;
 

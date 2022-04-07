@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    import { _ } from 'svelte-i18n';
+
     import Card from '@smui/card';
     import Button from '@smui/button';
     import CircularProgress from '@smui/circular-progress';
@@ -51,7 +53,7 @@
 
 <Card variant="outlined" class="h-100 p-3 pt-0 overflow-hidden d-flex flex-column justify-content-between">
 
-    <h4 class="text-center m-4">Lobby <strong>{$room.code}</strong></h4>
+    <h4 class="text-center m-4">{ $_('lobby.title', { values: { code: $room.code }} ) }</h4>
 
     <div class="sections mb-2">
         <PlaylistSection bind:showPlaylistError />
@@ -69,7 +71,7 @@
             {#if $isUpdatingOptions || loadingStart}
                 <CircularProgress indeterminate class="me-2" style="height: 24px; width: 24px;"/>
             {/if}
-            <span class="start-btn-label">Start Game</span>
+            <span class="start-btn-label">{ $_('lobby.startGame') }</span>
         </Button>
     </div>
 

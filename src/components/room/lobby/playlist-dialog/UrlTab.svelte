@@ -1,5 +1,7 @@
 <script lang="ts">
     
+    import { _ } from 'svelte-i18n';
+
     import Textfield, { TextfieldComponentDev } from '@smui/textfield';
     import TextfieldIcon from '@smui/textfield/icon';
     import HelperText from '@smui/textfield/helper-text';
@@ -13,8 +15,6 @@
         Label,
         SnackbarComponentDev 
     } from '@smui/snackbar';  
-     
-    import { _ } from 'svelte-i18n';
 
     import { getPlaylistSourceFromUrl } from '@/services/playlist.service';
     import { socket } from '@/services/socket.service';
@@ -52,7 +52,7 @@
     $: {
         if(textfield && url) {
             const input = textfield.getElement().querySelector('input');
-            input?.setCustomValidity(playlistSource ? '' : 'Invalid playlist url');
+            input?.setCustomValidity(playlistSource ? '' : $_('playlist.dialog.url.invalid'));
         }
     }
 
@@ -79,6 +79,10 @@
         });
     }
 
+    const supported_platforms = [
+        'Spotify'
+    ];
+
 </script>
 
 <form on:submit|preventDefault={handleSubmit}>
@@ -86,7 +90,9 @@
         <div class="flex-1 me-3">
             <Textfield bind:this={textfield} bind:value={url} label="URL" style="width: 100%;" required>
                 <TextfieldIcon class="material-icons" slot="leadingIcon">link</TextfieldIcon>
-                <HelperText slot="helper">Platforms supported: Spotify</HelperText>
+                <HelperText slot="helper">
+                    {$_('playlist.dialog.url.supportedPlatforms', { values: { platforms: supported_platforms.join(', ') }}) }
+                </HelperText>
             </Textfield>
         </div>
         <Fab

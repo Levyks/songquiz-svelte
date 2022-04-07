@@ -1,21 +1,60 @@
 errors:
-  unknown: Erro desconhecido
   onlyLeader: Somente o líder pode fazer isso
   playlist:
     unknownSource: 'Fonte de playlist desconhecida: "{source}"'
+home:
+  create:
+    title: Crie uma sala
+    btn: Criar
+  join:
+    title: Junte-se a uma sala
+    btn: Juntar-se
+  usernameLabel: Seu apelido
+  usernameHelper: O nome que os outros jogadores verão
+  codeLabel: Código da sala
+  aboutMe: Sobre mim
 playlist:
   notSet: Playlist não definida
+  notSetShort: Não definida
   logoAlt: Logo do(a) {platform}
   coverAlt: Imagem de capa da playlist
   byCreator: Por {creator}
+  dialog:
+    title: Gerenciar Playlist
+    tabs:
+      url: URL
+      loginWithSpotify: Entrar com Spotify
+    info:
+      name: Nome
+      platform: Plataforma
+      numberOfPlayable: "N° de músicas válidas"
+      numberOfRemaining: "N° de músicas restantes"
+    url:
+      invalid: URL de playlist inválida
+      supportedPlatforms: "Plataformas suportadas: {platforms}"
 room:
   connecting: Conectando-se a sala
   connectionLost: A conexão foi perdida, tentando reconectar
+  starting: O jogo está prestes a começar
+lobby:
+  title: Sala {code}
+  inviteCopied: A URL de convite foi copiada para a área de transferência
+  startGame: Começar o jogo
+  settings:
+    numberOfRounds: "Rodadas: <b>{number}</b>"
+    secondsPerRound: "<b>{seconds}</b> segundos por rodada"
+    guessModeLabel: "Você adivinhará:"
+    guessModes:
+      song: Música
+      artist: Artista(s)
+      both: Ambos (Aleatório)
+    showGuessesPreview: Mostrar respostas no meio da rodada.
 round:
   numberLabel: Rodada {number}
   typeLabels:
     song: Adivinhe a música
     artist: Adivinhe o(s) artista(s)
+  remainingLabel: "{time} segundos restantes"
   interactionNeeded: Interação necessária
   interactionNeededDesc: Não podemos tocar a música sem interação do usuário
   interactionBtnLabel: Clique para tocar
@@ -27,5 +66,14 @@ round:
 history:
   title: Você acabou de ouvir
   empty: Você ainda não ouviu nada
+players:
+  title: Jogadores
+  kick: Expulsar
+  ban: Banir (IP)
+  makeLeader: Tornar líder
 misc:
   loading: Carregando
+  volume: Volume
+  close: Fechar
+  unknownError: Erro desconhecido
+  comingSoon: Em breve

@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    import { _ } from 'svelte-i18n';
+
     import Slider from '@smui/slider';  
     import Radio from '@smui/radio';
     import FormField from '@smui/form-field';
@@ -12,8 +14,6 @@
     import IconButton from '@smui/icon-button';
 
     import ErrorLabel from '@/components/misc/ErrorLabel.svelte';
-    
-    import { _ } from 'svelte-i18n';
 
     import { room, isUpdatingOptions, isSelfLeader } from '@/stores';
     import { socket } from '@/services/socket.service';
@@ -25,9 +25,9 @@
     let error: SongQuizError;
 
     const guessModeLabels: { [key: string]: string } = {
-        [RoomGuessMode.Song]: 'Song',
-        [RoomGuessMode.Artist]: 'Artist(s)',
-        [RoomGuessMode.Both]: 'Both (Random)',
+        [RoomGuessMode.Song]: $_('lobby.settings.guessModes.song'),
+        [RoomGuessMode.Artist]: $_('lobby.settings.guessModes.artist'),
+        [RoomGuessMode.Both]: $_('lobby.settings.guessModes.both'),
     };
 
     function handleChange() {
@@ -49,7 +49,7 @@
 </script>
 
 <div class="d-flex align-items-center">
-    <span>Rounds: <strong>{$room.options.numberOfRounds}</strong></span>
+    <span>{@html $_('lobby.settings.numberOfRounds', { values: {number: $room.options.numberOfRounds}}) }</span>
     <Slider
         class="flex-1"
         min={5}
@@ -62,7 +62,7 @@
 </div>
 
 <div class="d-flex align-items-center">
-    <span><strong>{$room.options.secondsPerRound}</strong> seconds per round</span>
+    <span>{@html $_('lobby.settings.secondsPerRound', { values: { seconds: $room.options.secondsPerRound }})}</span>
     <Slider
         class="flex-1"
         min={5}
@@ -99,7 +99,7 @@
         bind:checked={$room.options.showGuessesPreview} 
         on:SMUISwitch:change={handleChange}
     />
-    <span slot="label">Show guesses preview.</span>
+    <span slot="label">{ $_('lobby.settings.showGuessesPreview') }</span>
 </FormField>
 
 <Snackbar bind:this={errorSnackbar}>
