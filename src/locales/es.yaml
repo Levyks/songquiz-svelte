@@ -1,0 +1,85 @@
+# Spanish Version Created by GitHub Copilot
+
+home:
+  create:
+    title: Crear una sala
+    btn: Crear
+  join:
+    title: Unirse a una sala
+    btn: Unirse
+  usernameLabel: Tu nombre de usuario
+  usernameHelper: El nombre que los otros jugadores verán
+  codeLabel: Código de la sala
+  aboutMe: Acerca de mí
+playlist:
+  notSet: Playlist no establecida
+  notSetShort: No establecida
+  logoAlt: '{platform} logo'
+  coverAlt: Portada de la playlist
+  byCreator: Por {creator}
+  dialog:
+    title: Administrar playlist
+    tabs:
+      url: URL
+      loginWithSpotify: Login con Spotify
+    info:
+      name: Nombre
+      platform: Plataforma
+      numberOfPlayable: "N° de canciones reproducibles:"
+      numberOfRemaining: "N° de canciones no reproducidas:"
+    url:
+      invalid: URL de playlist inválida
+      supportedPlatforms: "Plataformas soportadas: {platforms}"
+  unknownSource: 'Fuente de playlist desconocida: "{source}"'
+room:
+  connecting: Conectando a la sala
+  connectionLost: Conexión perdida, intentando reconectar
+  starting: La partida está a punto de comenzar
+  onlyLeader: Solo el líder puede hacer esto
+  joining: Uniéndose...
+  creating: Creando...
+  failedToJoin: Error al unirse a la sala
+  failedToCreate: Error al crear la sala
+lobby:
+  title: Sala {code}
+  inviteCopied: La URL de invitación se ha copiado en el portapapeles
+  startGame: Comenzar partida
+  settings:
+    numberOfRounds: "Rondas: <b>{number}</b>"
+    secondsPerRound: "<b>{seconds}</b> segundos por ronda"
+    guessModeLabel: "Estarás adivinando:"
+    guessModes:
+      song: Canción
+      artist: Artista(s)
+      both: Ambos (aleatorio)
+    showGuessesPreview: Mostrar previsualización de adivinanzas.
+  playlist: "Playlist:"
+round:
+  numberLabel: Ronda {number}
+  typeLabels:
+    song: Adivina la canción
+    artist: Adivina el(los) artista(s)
+  remainingLabel: "{time} segundos restantes"
+  interactionNeeded: Interacción necesaria
+  interactionNeededDesc: No podemos reproducir la canción sin interacción del usuario
+  interactionBtnLabel: Clic para reproducir
+  results:
+    title: Resultados
+    noOneCorrect: Nadie adivinó correctamente, la canción era {song} por {artist}
+    nextRoundIn: La siguiente ronda comenzará en {time} segundos
+    finalResultsIn: Resultados finales en {time} segundos
+history:
+  title: Has escuchado
+  empty: No has escuchado nada aún
+players:
+  title: Jugadores
+  kick: Expulsar
+  ban: Banear (IP)
+  makeLeader: Hacer líder
+misc:
+  loading: Cargando
+  volume: Volumen
+  close: Cerrar
+  unknownError: Error desconocido
+  comingSoon: Próximamente
+  dismiss: Descartar
