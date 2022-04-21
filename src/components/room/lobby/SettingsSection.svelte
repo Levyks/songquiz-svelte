@@ -75,7 +75,7 @@
 </div>
 
 <div class="d-flex align-items-center">
-    <span>You'll be guessing:</span>
+    <span>{$_('lobby.settings.guessModeLabel')}</span>
     <div class="d-flex flex-wrap">
         {#each Object.entries(guessModeLabels) as [key, label]}
             <FormField>
@@ -105,7 +105,7 @@
 <Snackbar bind:this={errorSnackbar}>
     <Label><ErrorLabel {error}/></Label>
     <Actions>
-      <IconButton class="material-icons" title="Dismiss">close</IconButton>
+      <IconButton class="material-icons" title={$_('misc.dismiss')}>close</IconButton>
     </Actions>
 </Snackbar>
 

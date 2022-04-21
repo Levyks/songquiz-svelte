@@ -2,7 +2,7 @@
     import { Icon } from '@smui/common';
 
     import PlayerIcon from '@/components/misc/PlayerIcon.svelte';
-    import type { Player } from '@/typings/main';
+    import type { Player } from '@/typings/state';
     import { room, player as selfPlayer } from '@/stores';
     import PlayerLeaderMenu from './PlayerLeaderMenu.svelte';
 

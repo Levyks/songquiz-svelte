@@ -1,4 +1,4 @@
-import type { Color } from "@/typings/main";
+import type { Color } from "@/typings/misc";
 
 export function delay(ms: number): Promise<void> {
     return new Promise(resolve => {
@@ -16,13 +16,15 @@ export function getHtmlColor(color: Color) {
     return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
 }
 
+export function addPlaySilenceTrap() {
+    
+    function listener() {
+        document.body.removeEventListener("click", listener);
+        
+        const audio = new Audio();
+        audio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+        audio.play();
+    }
 
-export function playAudio(audioPath: string, volume: number = 0.5): HTMLAudioElement {
-
-    const audio = new Audio();
-    audio.volume = volume;
-    audio.autoplay = true;
-    audio.src = audioPath;
-    return audio;
-
+    document.body.addEventListener("click", listener);
 }

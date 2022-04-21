@@ -1,7 +1,3 @@
-errors:
-  onlyLeader: Somente o líder pode fazer isso
-  playlist:
-    unknownSource: 'Fonte de playlist desconhecida: "{source}"'
 home:
   create:
     title: Crie uma sala
@@ -32,10 +28,16 @@ playlist:
     url:
       invalid: URL de playlist inválida
       supportedPlatforms: "Plataformas suportadas: {platforms}"
+  unknownSource: 'Fonte de playlist desconhecida: "{source}"'
 room:
   connecting: Conectando-se a sala
   connectionLost: A conexão foi perdida, tentando reconectar
   starting: O jogo está prestes a começar
+  onlyLeader: Somente o líder pode fazer isso
+  joining: Entrando...
+  creating: Criando...
+  failedToJoin: Falha ao entrar na sala
+  failedToCreate: Falha ao criar a sala
 lobby:
   title: Sala {code}
   inviteCopied: A URL de convite foi copiada para a área de transferência
@@ -49,6 +51,7 @@ lobby:
       artist: Artista(s)
       both: Ambos (Aleatório)
     showGuessesPreview: Mostrar respostas no meio da rodada.
+  playlist: "Playlist:"
 round:
   numberLabel: Rodada {number}
   typeLabels:
@@ -77,3 +80,4 @@ misc:
   close: Fechar
   unknownError: Erro desconhecido
   comingSoon: Em breve
+  dismiss: Descartar

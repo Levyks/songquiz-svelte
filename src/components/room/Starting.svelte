@@ -6,7 +6,6 @@
     import Card from '@smui/card';
 
     import { room } from '@/stores';
-    import { playAudio } from '@/helpers';  
 
     const step = 100;
     const totalTime = $room.nextRoundStartsIn! * (1000 / step);
@@ -23,11 +22,8 @@
         }
     }, step);
 
-    const audio = playAudio('/assets/audio/countdown.mp3', 0.5);
-
     onDestroy(() => {
         if(interval) clearInterval(interval);
-        if(!audio.ended) audio.pause();
     });
 
 </script>
@@ -43,3 +39,5 @@
         <h3 class="text-center m-4">{Math.ceil(remainingTime/(1000 / step)) || 'Starting'}</h3>
     </div>
 </Card>
+
+<audio src="/assets/audio/countdown.mp3" volume={0.5} autoplay/>

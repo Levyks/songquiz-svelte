@@ -31,16 +31,14 @@
                 navigate(`/room/${roomCode}`);
             })
             .catch((err: AxiosError) => {
-
-                console.error(err);
-
-                let message = 'Unknown error';
+                
+                let message = $_('misc.unknownError');
 
                 if(err.isAxiosError) {
                     message = err.response?.data?.message || message; 
                 }
 
-                alertTitle = 'Failed to join room';
+                alertTitle = $_('room.failedToJoin');
                 alertContent = message;
                 alertOpen = true;
 
@@ -52,7 +50,7 @@
     
 </script>
 
-<LoadingDialog open={loading} text="Joining..."/>
+<LoadingDialog open={loading} text={$_('room.joining')}/>
 <AlertDialog bind:open={alertOpen} title={alertTitle} content={alertContent}/>
 
 <form on:submit|preventDefault={handleJoin}>

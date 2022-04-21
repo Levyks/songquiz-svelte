@@ -1,7 +1,3 @@
-errors:
-  onlyLeader: Only the leader can do this
-  playlist:
-    unknownSource: 'Unknown playlist source: "{source}"'
 home:
   create:
     title: Create a room
@@ -32,10 +28,16 @@ playlist:
     url:
       invalid: Invalid playlist URL
       supportedPlatforms: "Supported platforms: {platforms}"
+  unknownSource: 'Unknown playlist source: "{source}"'
 room:
   connecting: Connecting to the room
   connectionLost: Connection lost, trying to reconnect
   starting: The game is about to start
+  onlyLeader: Only the leader can do this
+  joining: Joining...
+  creating: Creating...
+  failedToJoin: Failed to join the room
+  failedToCreate: Failed to create the room
 lobby:
   title: Room {code}
   inviteCopied: The invite URL has been copied to your clipboard
@@ -49,6 +51,7 @@ lobby:
       artist: Artist(s)
       both: Both (Random)
     showGuessesPreview: Show guesses preview.
+  playlist: "Playlist:"
 round:
   numberLabel: Round {number}
   typeLabels:
@@ -77,3 +80,4 @@ misc:
   close: Close
   unknownError: Unknown error
   comingSoon: Coming soon
+  dismiss: Dismiss

@@ -17,7 +17,7 @@
     import SettingsSection from './SettingsSection.svelte';
     import ErrorLabel from '@/components/misc/ErrorLabel.svelte';
 
-    import { room, isSelfLeader, isUpdatingOptions } from '@/stores';
+    import { room, isUpdatingOptions } from '@/stores';
     import { SongQuizError } from "@/misc/errors";
     import { socket } from '@/services/socket.service';
 

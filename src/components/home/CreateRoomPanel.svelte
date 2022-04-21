@@ -29,13 +29,13 @@
             })
             .catch((err: AxiosError) => {
 
-                let message = 'Unknown error';
+                let message = $_('misc.unknownError');
 
                 if(err.isAxiosError) {
                     message = err.response?.data?.message || message; 
                 }
 
-                alertTitle = 'Failed to create room';
+                alertTitle = $_('room.failedToCreate');
                 alertContent = message;
                 alertOpen = true;
 
@@ -47,7 +47,7 @@
 
 </script>
 
-<LoadingDialog open={loading} text="Joining..."/>
+<LoadingDialog open={loading} text={$_('room.creating')}/>
 <AlertDialog bind:open={alertOpen} title={alertTitle} content={alertContent}/>
 
 <form on:submit|preventDefault={handleCreate}>

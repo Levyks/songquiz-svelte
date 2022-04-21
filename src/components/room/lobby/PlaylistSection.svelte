@@ -16,7 +16,7 @@
 </script>
 
 <div class="d-flex align-items-center justify-content-between">
-    <span>Playlist:</span>
+    <span>{$_('lobby.playlist')}</span>
     <div class="d-flex flex-wrap justify-content-center align-items-center">
         {#if $room.playlist}
             <PlaylistFab /> 
